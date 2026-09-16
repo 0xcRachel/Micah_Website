@@ -1,4 +1,4 @@
-﻿import Lenis from 'lenis';
+import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -27,6 +27,20 @@ export function initSmoothScroll(): Lenis {
   });
 
   gsap.ticker.lagSmoothing(0);
+
+  // In-page anchor click navigation support
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener('click', (e) => {
+      const targetId = anchor.getAttribute('href');
+      if (targetId && targetId.length > 1) {
+        const targetEl = document.querySelector(targetId);
+        if (targetEl) {
+          e.preventDefault();
+          lenis.scrollTo(targetEl, { duration: 1.2 });
+        }
+      }
+    });
+  });
 
   return lenis;
 }

@@ -355,9 +355,9 @@ function initPreloader() {
   }, 420);
 }
 
-if (document.readyState === 'complete') {
-  initPreloader();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPreloader);
 } else {
-  window.addEventListener('load', initPreloader);
+  initPreloader();
 }
 </script>

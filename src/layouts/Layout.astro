@@ -1,6 +1,5 @@
 ---
 // Layout.astro — Master Digital Stage Layout
-import Preloader from '../components/Preloader.astro';
 
 interface Props {
   title?: string;
@@ -36,14 +35,7 @@ const {
 
     <link rel="stylesheet" href="/src/styles/global.css" />
   </head>
-  <body data-current_section="hero" data-cursor-hover="false">
-    <!-- Cinematic Boot Preloader -->
-    <Preloader />
-
-    <!-- Custom Dual Element Cursor -->
-    <div class="cursor-dot" aria-hidden="true"></div>
-    <div class="cursor-ring" aria-hidden="true"></div>
-
+  <body data-current_section="hero">
     <!-- Persistent Global WebGL Canvas Container -->
     <div id="webgl-canvas-container" aria-hidden="true"></div>
 
@@ -54,11 +46,10 @@ const {
       import { SceneManager } from '../three/SceneManager';
       import { initSmoothScroll } from '../animation/lenis';
       import { initScrollNarrative } from '../animation/scrollNarrative';
-      import { initCustomCursor } from '../animation/cursor';
       import { initTextAnimations } from '../animation/textAnimation';
 
       // Initialize when DOM is ready
-      document.addEventListener('DOMContentLoaded', () => {
+      const initApp = () => {
         // Initialize Smooth Scroll with Lenis
         const lenis = initSmoothScroll();
 
@@ -109,12 +100,16 @@ const {
           }) as EventListener);
         }
 
-        // Initialize Custom Magnetic Cursor
-        initCustomCursor();
 
         // Initialize Editorial Headline Animations
         initTextAnimations();
-      });
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+      } else {
+        initApp();
+      }
     </script>
   </body>
 </html>
