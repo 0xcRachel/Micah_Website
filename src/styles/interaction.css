@@ -163,6 +163,13 @@ button:focus-visible {
   z-index: 2;
 }
 
+/* Ripple must stay absolute — the rule above would otherwise pull it into flow
+   and inflate the button (specificity 0,2,0 wins over 0,1,0). */
+.btn-primary-signal > .click-ripple {
+  position: absolute;
+  z-index: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .click-shockwave,
   .click-ripple,

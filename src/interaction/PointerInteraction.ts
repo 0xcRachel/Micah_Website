@@ -20,7 +20,7 @@ export function pressDown(el: HTMLElement) {
   });
 }
 
-/** Release: 0.96 -> 1.03 -> 1 with elastic settle. */
+/** Release: 0.96 -> 1.012 -> 1, settles fast with minimal overshoot. */
 export function pressUp(el: HTMLElement) {
   gsap.killTweensOf(el, 'scale,y');
   if (REDUCED_MOTION) {
@@ -28,18 +28,18 @@ export function pressUp(el: HTMLElement) {
     return;
   }
   const tl = gsap.timeline();
-  tl.to(el, { scale: 1.03, y: 0, duration: 0.09, ease: 'expo.out', overwrite: 'auto' }).to(el, {
+  tl.to(el, { scale: 1.012, y: 0, duration: 0.09, ease: 'expo.out', overwrite: 'auto' }).to(el, {
     scale: 1,
     y: 0,
-    duration: 0.45,
-    ease: 'elastic.out(1, 0.45)',
+    duration: 0.3,
+    ease: 'elastic.out(1, 0.6)',
   });
 }
 
 /** Subtle button text shift (-4px out, masked re-entry). Major CTAs only. */
 export function nudgeButtonText(el: HTMLElement) {
   if (REDUCED_MOTION) return;
-  const span = el.querySelector('span');
+  const span = el.querySelector('span:not(.click-ripple)');
   if (!span) return;
   gsap.killTweensOf(span);
   gsap.timeline()

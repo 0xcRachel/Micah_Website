@@ -253,19 +253,17 @@ export class ProductCore {
     this.targetScale.set(s, s, s);
   }
 
-  // Trigger interactive shockwave pulse (+ accent + scale pop, restores section values)
+  // Trigger interactive shockwave pulse (+ accent flash, restores section values)
+  // Note: no scale pop here — the core must never look like it "grows" on click.
   public dischargeImpulse() {
     const prevDistortion = this.targetDistortion;
     const prevAccent = this.targetAccentMix;
-    const prevScale = this.targetScale.x;
     this.targetDistortion = 2.2;
     this.targetAccentMix = Math.max(this.targetAccentMix, 0.85);
-    this.setTargetScale(Math.min(prevScale * 1.1, 1.25));
     this.shockwaveProgress[0] = 0.0;
     setTimeout(() => {
       this.targetDistortion = prevDistortion;
       this.targetAccentMix = prevAccent;
-      this.setTargetScale(prevScale);
     }, 450);
   }
 
