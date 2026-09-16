@@ -1,0 +1,175 @@
+/* interaction.css — Premium click/tap layer (additive only, no redesign) */
+
+[data-click] {
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-magnetic {
+  isolation: isolate;
+}
+
+.click-shockwave {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border: 1px solid var(--accent, #d7ff00);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+}
+
+.click-ripple {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(215, 255, 0, 0.35) 0%, rgba(215, 255, 0, 0.12) 45%, transparent 70%);
+  filter: blur(6px);
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 0;
+}
+
+.click-particle {
+  position: fixed;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+}
+
+#custom-cursor-dot,
+#custom-cursor-ring {
+  position: fixed;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  z-index: var(--z-cursor, 999999);
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #custom-cursor-dot,
+  #custom-cursor-ring {
+    display: flex;
+  }
+  /* Hide the native cursor only when the custom one is active (desktop) */
+  .has-custom-cursor,
+  .has-custom-cursor * {
+    cursor: none !important;
+  }
+}
+
+#custom-cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--accent, #d7ff00);
+  box-shadow: 0 0 8px rgba(215, 255, 0, 0.7);
+}
+
+#custom-cursor-ring {
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono, monospace);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: #000;
+}
+
+#custom-cursor-ring.has-label {
+  width: auto;
+  min-width: 64px;
+  height: 28px;
+  margin: -14px 0 0 -32px;
+  padding: 0 10px;
+  border-radius: 14px;
+  background: var(--accent, #d7ff00);
+  border-color: transparent;
+  font-weight: 700;
+}
+
+#custom-cursor-ring .cursor-label {
+  display: none;
+  white-space: nowrap;
+}
+
+#custom-cursor-ring.has-label .cursor-label {
+  display: block;
+}
+
+[data-click]:focus-visible,
+a:focus-visible,
+button:focus-visible {
+  outline: 1px solid var(--accent, #d7ff00);
+  outline-offset: 3px;
+}
+
+/* ── Scroll progress hairline ─────────────────────────── */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 2px;
+  z-index: 99999;
+  pointer-events: none;
+  background: transparent;
+}
+
+#scroll-progress-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(215, 255, 0, 0.55), var(--accent, #d7ff00));
+  box-shadow: 0 0 10px rgba(215, 255, 0, 0.5);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+/* ── Primary button shine sweep on hover ───────────────── */
+.btn-primary-signal {
+  overflow: hidden;
+}
+
+.btn-primary-signal::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.45) 50%, transparent 100%);
+  transform: skewX(-20deg);
+  transition: left 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.btn-primary-signal:hover::after {
+  left: 130%;
+}
+
+.btn-primary-signal > * {
+  position: relative;
+  z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .click-shockwave,
+  .click-ripple,
+  .click-particle {
+    display: none !important;
+  }
+  .btn-primary-signal::after {
+    display: none;
+  }
+}

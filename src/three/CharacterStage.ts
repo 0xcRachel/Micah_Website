@@ -21,6 +21,13 @@ export class CharacterStage {
   private targetRotationX = 0;
   private clickImpulse = 0;
 
+  // Scroll-velocity energy (fed by lenis scrollBoost event, decays each frame)
+  public energy = 0.0;
+
+  public addEnergy(v: number) {
+    this.energy = Math.max(0, Math.min(1, this.energy + v));
+  }
+
   // Orbiting satellite beads
   private satelliteMeshes: THREE.Mesh[] = [];
 
@@ -210,14 +217,21 @@ export class CharacterStage {
     this.group.visible = this.currentOpacity > 0.005;
 
     const op = this.currentOpacity;
+
+    // Cinematic entrance: scale + rise with opacity (eased)
+    const entrance = op * op * (3.0 - 2.0 * op);
+    this.group.scale.setScalar(0.86 + 0.14 * entrance);
+    this.group.position.y = (1.0 - entrance) * -0.35;
     this.charMat.opacity = op;
     this.shadowMat.opacity = 0.55 * op;
     this.haloMats[0].opacity = 0.45 * op;
     this.haloMats[1].opacity = 0.30 * op;
     (this.sparklePoints.material as THREE.PointsMaterial).opacity = 0.65 * op;
 
-    // Decay click impulse
+    // Decay click impulse + scroll energy
     this.clickImpulse = Math.max(0, this.clickImpulse - delta * 2.2);
+    this.energy = Math.max(0, this.energy - delta * 1.4);
+    const vigor = this.clickImpulse + this.energy * 0.6;
 
     // Organic breathing & spring jump on click
     const breathFreq = 2.0;
@@ -230,12 +244,12 @@ export class CharacterStage {
     // Responsive head/body tracking inertia
     this.characterMesh.rotation.y += (this.targetRotationY - this.characterMesh.rotation.y) * 0.08;
     this.characterMesh.rotation.x += (this.targetRotationX - this.characterMesh.rotation.x) * 0.08;
-    this.characterMesh.rotation.z = Math.sin(elapsed * 1.1) * 0.018;
+    this.characterMesh.rotation.z = Math.sin(elapsed * 1.1) * (0.018 + this.energy * 0.03);
 
-    // Halo astrolabe counter-rotations
+    // Halo astrolabe counter-rotations (energized by clicks + scroll)
     this.haloGroup.position.y = floatY;
-    this.haloGroup.children[0].rotation.z += delta * (0.35 + this.clickImpulse * 2.0);
-    this.haloGroup.children[1].rotation.z -= delta * (0.25 + this.clickImpulse * 1.5);
+    this.haloGroup.children[0].rotation.z += delta * (0.35 + vigor * 2.0);
+    this.haloGroup.children[1].rotation.z -= delta * (0.25 + vigor * 1.5);
     this.haloGroup.children[2].rotation.y = Math.sin(elapsed * 0.9) * 0.15;
 
     // Satellite beads vertical micro-oscillation
@@ -265,7 +279,7 @@ export class CharacterStage {
     const posArray = posAttr.array as Float32Array;
 
     for (let i = 0; i < this.sparkleCount; i++) {
-      posArray[i * 3 + 1] += delta * this.sparkleSpeeds[i] * 0.35;
+      posArray[i * 3 + 1] += delta * this.sparkleSpeeds[i] * 0.35 * (1.0 + this.energy * 1.5);
       if (posArray[i * 3 + 1] > 2.2) {
         posArray[i * 3 + 1] = -2.0;
       }

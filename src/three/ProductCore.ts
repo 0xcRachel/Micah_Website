@@ -37,6 +37,14 @@ export class ProductCore {
   private particleAngles: Float32Array;
   private particleHeights: Float32Array;
 
+  // Scroll-velocity energy (target fed by events, smoothed every frame — no pops)
+  public scrollBoost = 0.0;
+  private scrollBoostTarget = 0.0;
+
+  public addScrollBoost(v: number) {
+    this.scrollBoostTarget = Math.max(0, Math.min(1.2, this.scrollBoostTarget + Math.min(v, 8) * 0.02));
+  }
+
   // Shockwave expansion timers
   private shockwaveProgress = [0.0, 0.5];
 
@@ -245,12 +253,19 @@ export class ProductCore {
     this.targetScale.set(s, s, s);
   }
 
-  // Trigger interactive shockwave pulse
+  // Trigger interactive shockwave pulse (+ accent + scale pop, restores section values)
   public dischargeImpulse() {
+    const prevDistortion = this.targetDistortion;
+    const prevAccent = this.targetAccentMix;
+    const prevScale = this.targetScale.x;
     this.targetDistortion = 2.2;
+    this.targetAccentMix = Math.max(this.targetAccentMix, 0.85);
+    this.setTargetScale(Math.min(prevScale * 1.1, 1.25));
     this.shockwaveProgress[0] = 0.0;
     setTimeout(() => {
-      this.targetDistortion = 1.0;
+      this.targetDistortion = prevDistortion;
+      this.targetAccentMix = prevAccent;
+      this.setTargetScale(prevScale);
     }, 450);
   }
 
@@ -259,9 +274,12 @@ export class ProductCore {
     this.group.position.lerp(this.targetPosition, 0.08);
     this.group.scale.lerp(this.targetScale, 0.08);
 
-    // Smooth lerps for shader parameters
+    // Smooth lerps for shader parameters (+ smoothed scroll energy overlay)
+    this.scrollBoostTarget = Math.max(0, this.scrollBoostTarget - delta * 1.1);
+    this.scrollBoost += (this.scrollBoostTarget - this.scrollBoost) * Math.min(1, delta * 6);
+    const energyBoost = this.scrollBoost * 0.25;
     this.currentDistortion += (this.targetDistortion - this.currentDistortion) * 0.08;
-    this.material.uniforms.uDistortion.value = this.currentDistortion;
+    this.material.uniforms.uDistortion.value = this.currentDistortion + energyBoost;
 
     this.currentAccentMix += (this.targetAccentMix - this.currentAccentMix) * 0.08;
     this.material.uniforms.uAccentMix.value = this.currentAccentMix;
@@ -287,13 +305,15 @@ export class ProductCore {
     // ─────────────────────────────────────────────────────────────────────────
     // MOTION DYNAMICS: Counter-rotations & Organic Fluid Breathing
     // ─────────────────────────────────────────────────────────────────────────
-    // 1. Fluid organic core rotation with silky pointer inertia
-    this.mainMesh.rotation.y += (this.targetRotationY - this.mainMesh.rotation.y) * 0.05 + delta * 0.18;
-    this.mainMesh.rotation.x += (this.targetRotationX - this.mainMesh.rotation.x) * 0.05 + delta * 0.10;
+    // 1. Fluid organic core rotation with silky pointer inertia (+ smooth energy spin)
+    const energySpin = this.scrollBoost * 0.5;
+    this.mainMesh.rotation.y += (this.targetRotationY - this.mainMesh.rotation.y) * 0.05 + delta * (0.18 + energySpin);
+    this.mainMesh.rotation.x += (this.targetRotationX - this.mainMesh.rotation.x) * 0.05 + delta * (0.10 + energySpin * 0.5);
 
-    // 2. Outer Geodesic Cage counter-rotates slowly & breathes
-    this.outerCage.rotation.y -= delta * 0.12;
-    this.outerCage.rotation.z += delta * 0.07;
+    // 2. Outer Geodesic Cage counter-rotates slowly & breathes (energized smoothly)
+    const cageEnergy = this.scrollBoost * 0.3;
+    this.outerCage.rotation.y -= delta * (0.12 + cageEnergy);
+    this.outerCage.rotation.z += delta * (0.07 + cageEnergy * 0.5);
     const cagePulse = 1.0 + Math.sin(elapsed * 1.8) * 0.035;
     this.outerCage.scale.set(cagePulse, cagePulse, cagePulse);
 

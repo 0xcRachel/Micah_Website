@@ -44,12 +44,16 @@ export class GamePlanes {
     this.targetOpacity = Math.max(0, Math.min(1, v));
   }
 
+  // Selection pulse: active card pops + glows, then settles (decays in update)
+  private activePulse = 0.0;
+
   public setPointer(ndcX: number, ndcY: number) {
     this.pointer.set(ndcX, ndcY);
   }
 
   public setActiveCard(index: number) {
     if (index < 0 || index >= this.planes.length) return;
+    if (index !== this.activeIndex) this.activePulse = 1.0;
     this.activeIndex = index;
     this.recalculateSlots();
   }
@@ -286,6 +290,14 @@ export class GamePlanes {
   private smoothScroll = 0.0;
   private smoothVelocity = 0.0;
 
+  // Reused scratch objects — avoids per-frame allocation (GC jitter)
+  private tmpBasePos = new THREE.Vector3();
+  private tmpBaseRot = new THREE.Vector3();
+  private tmpDestPos = new THREE.Vector3();
+  private tmpStackOrigin = new THREE.Vector3(0.6, -1.0, -2.0);
+  private tmpStackRot = new THREE.Vector3(0.20, -0.10, -0.06);
+  private tmpCardPos = new Float32Array(12);
+
   // Pre-calculated slot positions
   private slotOffsets = [
     // Slot 0: Active — center-stage, slight right offset, closest to camera
@@ -351,15 +363,20 @@ export class GamePlanes {
     this.currentOpacity += (this.targetOpacity - this.currentOpacity) * 0.08;
     this.group.visible = this.currentOpacity > 0.005;
 
+    // Decay selection pulse
+    this.activePulse = Math.max(0, this.activePulse - delta * 1.6);
+    const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const pulse = isReduced ? 0 : this.activePulse;
+
     // Mouse tilt parallax across the whole 3D deck
     const mouseTiltX = -this.pointer.y * 0.15;
     const mouseTiltY =  this.pointer.x * 0.18;
 
     // Compact stacked deck origin (cards originate tightly stacked before dealing)
-    const stackOrigin = new THREE.Vector3(0.6, -1.0, -2.0);
-    const stackRot    = new THREE.Vector3(0.20, -0.10, -0.06);
+    const stackOrigin = this.tmpStackOrigin;
+    const stackRot = this.tmpStackRot;
 
-    const positions: number[] = [];
+    const positions = this.tmpCardPos;
     const total = this.planes.length;
 
     this.planes.forEach((plane, i) => {
@@ -371,8 +388,8 @@ export class GamePlanes {
       const cardEntry = THREE.MathUtils.clamp((this.smoothScroll - i * 0.05) / 0.28, 0, 1);
       const ease = cardEntry * cardEntry * (3.0 - 2.0 * cardEntry);
 
-      const basePos   = new THREE.Vector3().lerpVectors(stackOrigin, slot.pos, ease);
-      const baseRot   = new THREE.Vector3().lerpVectors(stackRot, slot.rot, ease);
+      const basePos = this.tmpBasePos.lerpVectors(stackOrigin, slot.pos, ease);
+      const baseRot = this.tmpBaseRot.lerpVectors(stackRot, slot.rot, ease);
       const baseScale = THREE.MathUtils.lerp(0.70, slot.scale, ease);
 
       // ─── 2. Continuous Scroll Depth Traversal (0.35 -> 1.0) ───────────────
@@ -388,19 +405,22 @@ export class GamePlanes {
       const scrollTiltX = THREE.MathUtils.clamp(this.smoothVelocity * 0.08, -0.22, 0.22);
       const scrollTiltZ = THREE.MathUtils.clamp(this.smoothVelocity * (slotIndex === 3 ? 0.06 : -0.06), -0.14, 0.14);
 
-      // Subtle atmospheric float
-      const floatY = Math.sin(elapsed * 1.3 + i * 1.6) * 0.06;
+      // Subtle atmospheric float (active card breathes deeper = hero feel)
+      const isActive = slotIndex === 0;
+      const floatAmp = isActive ? 0.10 : 0.06;
+      const floatY = Math.sin(elapsed * 1.3 + i * 1.6) * floatAmp;
       const floatRotZ = Math.sin(elapsed * 0.8 + i * 1.2) * 0.015;
 
-      const destPos = new THREE.Vector3(
+      const destPos = this.tmpDestPos.set(
         basePos.x + parallaxX,
         basePos.y + floatY + parallaxY,
         basePos.z + parallaxZ
       );
 
-      // Smooth interpolation
+      // Smooth interpolation (active card pops on selection)
       plane.group.position.lerp(destPos, 0.08);
-      plane.group.scale.set(baseScale, baseScale, baseScale);
+      const popScale = baseScale * (isActive ? 1.0 + pulse * 0.09 : 1.0);
+      plane.group.scale.set(popScale, popScale, popScale);
 
       const targetRotX = baseRot.x + mouseTiltX + scrollTiltX;
       const targetRotY = baseRot.y + mouseTiltY;
@@ -421,7 +441,15 @@ export class GamePlanes {
         }
       });
 
-      positions.push(plane.group.position.x, plane.group.position.y, plane.group.position.z);
+      // Active edge glow pulse (traverse resets opacities, so re-apply highlight)
+      if (slot.isHighlight) {
+        plane.edgeMat.opacity =
+          (0.85 + Math.sin(elapsed * 3.0 + i) * 0.1 + pulse * 0.35) * this.currentOpacity * ease;
+      }
+
+      positions[i * 3] = plane.group.position.x;
+      positions[i * 3 + 1] = plane.group.position.y;
+      positions[i * 3 + 2] = plane.group.position.z;
     });
 
     // ─── 4. Laser Shimmer Surge on Scroll ──────────────────────────────────

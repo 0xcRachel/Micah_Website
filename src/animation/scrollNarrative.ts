@@ -458,15 +458,15 @@ export function initScrollNarrative(sceneManager: SceneManager) {
       }
     });
 
-    // Editorial text reveals
+    // Editorial text reveals — masked line-rise (alche-style editorial)
     const titleEls = el.querySelectorAll('.anim-title');
     if (titleEls.length > 0) {
       gsap.fromTo(
         titleEls,
-        { opacity: 0, y: 50, filter: 'blur(8px)' },
+        { opacity: 0, y: 64, filter: 'blur(10px)', clipPath: 'inset(0 0 100% 0)' },
         {
-          opacity: 1, y: 0, filter: 'blur(0px)',
-          duration: 1.1, ease: 'power3.out',
+          opacity: 1, y: 0, filter: 'blur(0px)', clipPath: 'inset(0 0 0% 0)',
+          duration: 1.2, ease: 'expo.out',
           scrollTrigger: { trigger: el, start: 'top 80%' }
         }
       );
@@ -476,13 +476,30 @@ export function initScrollNarrative(sceneManager: SceneManager) {
     if (fadeEls.length > 0) {
       gsap.fromTo(
         fadeEls,
-        { opacity: 0, y: 28 },
+        { opacity: 0, y: 30, scale: 0.985 },
         {
-          opacity: 1, y: 0,
-          duration: 0.85, stagger: 0.12, ease: 'power2.out',
+          opacity: 1, y: 0, scale: 1,
+          duration: 0.9, stagger: 0.12, ease: 'power3.out',
           scrollTrigger: { trigger: el, start: 'top 75%' }
         }
       );
     }
   });
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // 11. HERO PARALLAX EXIT — content drifts up + fades as the world takes over
+  // ─────────────────────────────────────────────────────────────────────────────
+  if (heroEl) {
+    gsap.to('.hero-text-block', {
+      yPercent: -12,
+      opacity: 0.15,
+      ease: 'none',
+      scrollTrigger: { trigger: heroEl, start: 'top top', end: 'bottom 35%', scrub: 1.0 },
+    });
+    gsap.to('.aerospace-reticle', {
+      yPercent: 10,
+      ease: 'none',
+      scrollTrigger: { trigger: heroEl, start: 'top top', end: 'bottom 35%', scrub: 1.0 },
+    });
+  }
 }

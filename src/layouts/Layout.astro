@@ -2,6 +2,7 @@
 // Layout.astro — Master Digital Stage Layout
 import '../styles/global.css';
 import '../styles/intro.css';
+import '../styles/interaction.css';
 
 interface Props {
   title?: string;
@@ -37,6 +38,9 @@ const {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
   <body data-current_section="hero">
+    <!-- Scroll progress hairline -->
+    <div id="scroll-progress" aria-hidden="true"><div id="scroll-progress-fill"></div></div>
+
     <!-- Persistent Global WebGL Canvas Container -->
     <div id="webgl-canvas-container" aria-hidden="true"></div>
 
@@ -48,6 +52,7 @@ const {
       import { initSmoothScroll } from '../animation/lenis';
       import { initScrollNarrative } from '../animation/scrollNarrative';
       import { initTextAnimations } from '../animation/textAnimation';
+      import { initInteractionManager } from '../interaction/ClickInteractionManager';
 
       // Initialize when DOM is ready
       const initApp = () => {
@@ -99,6 +104,22 @@ const {
           window.addEventListener('gameSelect', ((e: CustomEvent) => {
             sceneManager.gamePlanes.setActiveCard(e.detail.index);
           }) as EventListener);
+
+          // Scroll velocity -> WebGL energy (orb spin + character sway)
+          const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!reduced) {
+            window.addEventListener('scrollBoost', ((e: CustomEvent) => {
+              const v = Math.abs(e.detail?.velocity ?? 0);
+              sceneManager.productCore.addScrollBoost(v);
+              sceneManager.characterStage.addEnergy(Math.min(v * 0.15, 0.8));
+            }) as EventListener);
+          }
+
+          // Premium click/tap interaction layer (additive, non-destructive)
+          initInteractionManager(sceneManager);
+        } else {
+          // No WebGL stage (e.g. reduced environment) — interactions still work DOM-only
+          initInteractionManager(null);
         }
 
 
