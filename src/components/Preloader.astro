@@ -65,9 +65,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Flash beam shutter line for exit reveal -->
-  <div class="shutter-beam" id="shutter-beam" aria-hidden="true"></div>
 </div>
 
 <style>
@@ -286,28 +283,6 @@
   transition: width 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Exit Shutter Beam */
-.shutter-beam {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: #d7ff00;
-  box-shadow: 0 0 16px #d7ff00, 0 0 30px #d7ff00;
-  opacity: 0;
-  transform: scaleX(0);
-  transform-origin: center;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-  pointer-events: none;
-  z-index: 10;
-}
-
-.preloader-overlay.is-beaming .shutter-beam {
-  opacity: 1;
-  transform: scaleX(1);
-}
-
 .preloader-overlay.is-loaded {
   opacity: 0;
   visibility: hidden;
@@ -343,14 +318,9 @@ function initPreloader() {
       }
     } else {
       clearInterval(interval);
-      
-      // Step: Trigger razor beam flash
-      if (preloader) preloader.classList.add('is-beaming');
 
       // Final step: Fade out preloader cleanly
-      setTimeout(() => {
-        if (preloader) preloader.classList.add('is-loaded');
-      }, 350);
+      if (preloader) preloader.classList.add('is-loaded');
     }
   }, 420);
 }
