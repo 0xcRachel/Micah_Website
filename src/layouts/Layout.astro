@@ -85,9 +85,18 @@ const {
           }) as EventListener);
 
           window.addEventListener('corePulse', () => {
-            sceneManager.productCore.setDistortion(2.2);
-            setTimeout(() => sceneManager.productCore.setDistortion(1.0), 350);
+            sceneManager.productCore.dischargeImpulse();
           });
+
+          // Interactive click on Hero Stage anchor to impulse core
+          const heroAnchor = document.getElementById('hero-core-anchor');
+          if (heroAnchor) {
+            heroAnchor.style.pointerEvents = 'auto';
+            heroAnchor.style.cursor = 'pointer';
+            heroAnchor.addEventListener('click', () => {
+              sceneManager.productCore.dischargeImpulse();
+            });
+          }
 
           // Brand character reaction
           window.addEventListener('characterPoke', () => {

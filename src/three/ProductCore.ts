@@ -4,19 +4,18 @@ import { coreVertexShader, coreFragmentShader } from './shaders/core.vert';
 export class ProductCore {
   public group: THREE.Group;
   public mainMesh: THREE.Mesh;
+  public outerCage: THREE.LineSegments;
   public innerNucleus: THREE.Mesh;
   public outerGimbal: THREE.Group;
   public orbitalNodes: THREE.Points;
-  public reticleGroup: THREE.Group;
+  public shockwaveRings: THREE.Mesh[] = [];
   public material: THREE.ShaderMaterial;
 
-  private nucleusMat: THREE.MeshBasicMaterial;
   private edgeMat: THREE.LineBasicMaterial;
-  private ringMat1: THREE.MeshBasicMaterial;
-  private ringMat2: THREE.MeshBasicMaterial;
-  private ringMat3: THREE.MeshBasicMaterial;
-  private reticleMat: THREE.LineBasicMaterial;
-  private plateEdges: THREE.LineSegments;
+  private nucleusMat: THREE.MeshBasicMaterial;
+  private ringMats: THREE.MeshBasicMaterial[] = [];
+  private satelliteMeshes: THREE.Mesh[] = [];
+  private shockwaveMat: THREE.MeshBasicMaterial;
 
   // Inertial smooth-follow targets
   public targetPosition = new THREE.Vector3(1.4, 0, 0);
@@ -31,13 +30,23 @@ export class ProductCore {
   private targetRotationX = 0;
   private targetRotationY = 0;
 
+  // Particle positions & orbital speeds
+  private particleCount = 260;
+  private particleSpeeds: Float32Array;
+  private particleRadii: Float32Array;
+  private particleAngles: Float32Array;
+  private particleHeights: Float32Array;
+
+  // Shockwave expansion timers
+  private shockwaveProgress = [0.0, 0.5];
+
   constructor() {
     this.group = new THREE.Group();
     this.group.position.copy(this.targetPosition);
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 1. SIGNATURE OBSIDIAN & TITANIUM FACETED SHELL
-    // Clean, precision-cut polyhedral facets (no deformed noisy bumps)
+    // 1. ORGANIC LIQUID OBSIDIAN & IRIDESCENT CORE (Alche Studio standard)
+    // High-resolution subdivided icosahedron deformed by 3D simplex noise
     // ─────────────────────────────────────────────────────────────────────────
     this.material = new THREE.ShaderMaterial({
       vertexShader: coreVertexShader,
@@ -51,127 +60,168 @@ export class ProductCore {
         uOpacity: { value: 1.0 }
       },
       transparent: true,
-      depthWrite: true,
-      side: THREE.DoubleSide
+      depthWrite: false, // Prevents clipping & severing of surrounding elements
+      depthTest: true,
+      side: THREE.FrontSide
     });
 
-    // Precision Truncated Icosahedron / Geodesic Facet Core
-    const shellGeo = new THREE.IcosahedronGeometry(1.35, 1);
+    // High-subdivision mesh (smooth fluid waves)
+    const shellGeo = new THREE.IcosahedronGeometry(1.35, 4);
     this.mainMesh = new THREE.Mesh(shellGeo, this.material);
     this.group.add(this.mainMesh);
 
-    // Razor-Sharp Geometric Seam Edges (Laser Bevel Lines)
-    const edgeGeo = new THREE.EdgesGeometry(shellGeo);
+    // ─────────────────────────────────────────────────────────────────────────
+    // 2. HOLOGRAPHIC GEODESIC WIREFRAME CAGE (Floating outer energy lattice)
+    // ─────────────────────────────────────────────────────────────────────────
+    const cageGeo = new THREE.IcosahedronGeometry(1.58, 1);
+    const edgeGeo = new THREE.EdgesGeometry(cageGeo);
     this.edgeMat = new THREE.LineBasicMaterial({
       color: 0xd7ff00,
       transparent: true,
-      opacity: 0.55
+      opacity: 0.40,
+      depthWrite: false
     });
-    this.plateEdges = new THREE.LineSegments(edgeGeo, this.edgeMat);
-    this.mainMesh.add(this.plateEdges);
+    this.outerCage = new THREE.LineSegments(edgeGeo, this.edgeMat);
+    this.group.add(this.outerCage);
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 2. INNER QUANTUM NUCLEUS (Luminous Core Engine)
+    // 3. INNER QUANTUM NUCLEUS (Bioluminescent crystal anchor)
     // ─────────────────────────────────────────────────────────────────────────
-    const nucGeo = new THREE.OctahedronGeometry(0.65, 0);
+    const nucGeo = new THREE.OctahedronGeometry(0.55, 0);
     this.nucleusMat = new THREE.MeshBasicMaterial({
       color: 0xd7ff00,
       wireframe: true,
       transparent: true,
-      opacity: 0.85
+      opacity: 0.85,
+      depthWrite: false
     });
     this.innerNucleus = new THREE.Mesh(nucGeo, this.nucleusMat);
     this.group.add(this.innerNucleus);
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 3. AEROSPACE GYROSCOPIC GIMBAL RINGS (Swiss Watch / Quantum Calibrator)
+    // 4. AEROSPACE GYROSCOPIC ASTROLABE (3D Torus Rings + Satellites)
+    // No 2D planar clipping ("không bị khuyết")
     // ─────────────────────────────────────────────────────────────────────────
     this.outerGimbal = new THREE.Group();
 
-    // Equatorial Ring with Precision Ticks
-    const ringGeo1 = new THREE.RingGeometry(1.85, 1.87, 80);
-    this.ringMat1 = new THREE.MeshBasicMaterial({
+    // Ring 1: Equatorial Gyro Ring
+    const ringGeo1 = new THREE.TorusGeometry(1.95, 0.005, 6, 96);
+    const ringMat1 = new THREE.MeshBasicMaterial({
       color: 0x888888,
-      side: THREE.DoubleSide,
       transparent: true,
-      opacity: 0.3
+      opacity: 0.35,
+      depthWrite: false
     });
-    const ring1 = new THREE.Mesh(ringGeo1, this.ringMat1);
-
-    // Meridian Ring
-    const ringGeo2 = new THREE.RingGeometry(2.05, 2.07, 80);
-    this.ringMat2 = new THREE.MeshBasicMaterial({
-      color: 0xaaaaaa,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.22
-    });
-    const ring2 = new THREE.Mesh(ringGeo2, this.ringMat2);
-    ring2.rotation.x = Math.PI / 2;
-
-    // Polar Ring with Lime Accent Highlight
-    const ringGeo3 = new THREE.RingGeometry(2.25, 2.27, 80);
-    this.ringMat3 = new THREE.MeshBasicMaterial({
-      color: 0xd7ff00,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.35
-    });
-    const ring3 = new THREE.Mesh(ringGeo3, this.ringMat3);
-    ring3.rotation.y = Math.PI / 3;
-
+    this.ringMats.push(ringMat1);
+    const ring1 = new THREE.Mesh(ringGeo1, ringMat1);
     this.outerGimbal.add(ring1);
+
+    // Satellite 1
+    const satGeo = new THREE.SphereGeometry(0.035, 12, 12);
+    const satMat1 = new THREE.MeshBasicMaterial({ color: 0xd7ff00, depthWrite: false });
+    const sat1 = new THREE.Mesh(satGeo, satMat1);
+    sat1.position.x = 1.95;
+    ring1.add(sat1);
+    this.satelliteMeshes.push(sat1);
+
+    // Ring 2: Meridian Gyro Ring
+    const ringGeo2 = new THREE.TorusGeometry(2.18, 0.004, 6, 96);
+    const ringMat2 = new THREE.MeshBasicMaterial({
+      color: 0xaaaaaa,
+      transparent: true,
+      opacity: 0.28,
+      depthWrite: false
+    });
+    this.ringMats.push(ringMat2);
+    const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
+    ring2.rotation.x = Math.PI / 2;
     this.outerGimbal.add(ring2);
+
+    // Satellite 2
+    const satMat2 = new THREE.MeshBasicMaterial({ color: 0xffffff, depthWrite: false });
+    const sat2 = new THREE.Mesh(satGeo, satMat2);
+    sat2.position.x = 2.18;
+    ring2.add(sat2);
+    this.satelliteMeshes.push(sat2);
+
+    // Ring 3: Polar Accent Gyro Ring (Electric Lime)
+    const ringGeo3 = new THREE.TorusGeometry(2.42, 0.005, 6, 96);
+    const ringMat3 = new THREE.MeshBasicMaterial({
+      color: 0xd7ff00,
+      transparent: true,
+      opacity: 0.40,
+      depthWrite: false
+    });
+    this.ringMats.push(ringMat3);
+    const ring3 = new THREE.Mesh(ringGeo3, ringMat3);
+    ring3.rotation.y = Math.PI / 3;
     this.outerGimbal.add(ring3);
+
+    // Satellite 3
+    const satMat3 = new THREE.MeshBasicMaterial({ color: 0xd7ff00, depthWrite: false });
+    const sat3 = new THREE.Mesh(satGeo, satMat3);
+    sat3.position.x = 2.42;
+    ring3.add(sat3);
+    this.satelliteMeshes.push(sat3);
+
     this.group.add(this.outerGimbal);
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 4. PRECISION HUD CROSSHAIR RETICLE
+    // 5. EXPANDING SHOCKWAVE PULSE RINGS (Periodic radar wave impulse)
     // ─────────────────────────────────────────────────────────────────────────
-    this.reticleGroup = new THREE.Group();
-    const reticlePositions = new Float32Array([
-      -0.4, 0, 0,  0.4, 0, 0,
-      0, -0.4, 0,  0, 0.4, 0,
-      0, 0, -0.4,  0, 0, 0.4
-    ]);
-    const reticleGeo = new THREE.BufferGeometry();
-    reticleGeo.setAttribute('position', new THREE.BufferAttribute(reticlePositions, 3));
-    this.reticleMat = new THREE.LineBasicMaterial({
+    this.shockwaveMat = new THREE.MeshBasicMaterial({
       color: 0xd7ff00,
       transparent: true,
-      opacity: 0.65
+      opacity: 0.25,
+      side: THREE.DoubleSide,
+      depthWrite: false
     });
-    const reticleLines = new THREE.LineSegments(reticleGeo, this.reticleMat);
-    this.reticleGroup.add(reticleLines);
-    this.group.add(this.reticleGroup);
+
+    for (let i = 0; i < 2; i++) {
+      const swGeo = new THREE.RingGeometry(1.4, 1.43, 80);
+      const swMesh = new THREE.Mesh(swGeo, this.shockwaveMat.clone());
+      swMesh.rotation.x = Math.PI / 2.2;
+      swMesh.scale.set(1, 1, 1);
+      this.shockwaveRings.push(swMesh);
+      this.group.add(swMesh);
+    }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 5. ORBITAL QUANTUM MOTES (Accretion Disc Particles)
+    // 6. ACCRETION DISC PARTICLE SWARM (260 Stardust vortex motes)
     // ─────────────────────────────────────────────────────────────────────────
-    const moteCount = 70;
-    const motePos = new Float32Array(moteCount * 3);
-    for (let i = 0; i < moteCount; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 1.6 + Math.random() * 0.9;
-      motePos[i * 3] = Math.cos(angle) * dist;
-      motePos[i * 3 + 1] = (Math.random() - 0.5) * 0.35;
-      motePos[i * 3 + 2] = Math.sin(angle) * dist;
+    this.particleSpeeds = new Float32Array(this.particleCount);
+    this.particleRadii  = new Float32Array(this.particleCount);
+    this.particleAngles = new Float32Array(this.particleCount);
+    this.particleHeights = new Float32Array(this.particleCount);
+
+    const motePos = new Float32Array(this.particleCount * 3);
+    for (let i = 0; i < this.particleCount; i++) {
+      this.particleRadii[i] = 1.7 + Math.random() * 1.3;
+      this.particleAngles[i] = Math.random() * Math.PI * 2;
+      this.particleSpeeds[i] = 0.25 + Math.random() * 0.45;
+      this.particleHeights[i] = (Math.random() - 0.5) * 0.55;
+
+      motePos[i * 3]     = Math.cos(this.particleAngles[i]) * this.particleRadii[i];
+      motePos[i * 3 + 1] = this.particleHeights[i];
+      motePos[i * 3 + 2] = Math.sin(this.particleAngles[i]) * this.particleRadii[i];
     }
+
     const moteGeo = new THREE.BufferGeometry();
     moteGeo.setAttribute('position', new THREE.BufferAttribute(motePos, 3));
     const moteMat = new THREE.PointsMaterial({
       color: 0xffffff,
-      size: 0.035,
+      size: 0.038,
       transparent: true,
-      opacity: 0.65
+      opacity: 0.70,
+      depthWrite: false
     });
     this.orbitalNodes = new THREE.Points(moteGeo, moteMat);
     this.group.add(this.orbitalNodes);
   }
 
   public setPointer(ndcX: number, ndcY: number, worldX: number, worldY: number) {
-    this.targetRotationY = ndcX * 0.65;
-    this.targetRotationX = -ndcY * 0.65;
+    this.targetRotationY = ndcX * 0.75;
+    this.targetRotationX = -ndcY * 0.75;
     this.material.uniforms.uPointer.value.set(worldX, worldY, 1.0);
   }
 
@@ -195,6 +245,15 @@ export class ProductCore {
     this.targetScale.set(s, s, s);
   }
 
+  // Trigger interactive shockwave pulse
+  public dischargeImpulse() {
+    this.targetDistortion = 2.2;
+    this.shockwaveProgress[0] = 0.0;
+    setTimeout(() => {
+      this.targetDistortion = 1.0;
+    }, 450);
+  }
+
   public update(delta: number, elapsed: number, cameraPos: THREE.Vector3) {
     // Smooth physical position and scale interpolation
     this.group.position.lerp(this.targetPosition, 0.08);
@@ -213,12 +272,11 @@ export class ProductCore {
 
     const op = this.currentOpacity;
     this.nucleusMat.opacity = 0.85 * op;
-    this.edgeMat.opacity = 0.55 * op;
-    this.ringMat1.opacity = 0.3 * op;
-    this.ringMat2.opacity = 0.22 * op;
-    this.ringMat3.opacity = 0.35 * op;
-    this.reticleMat.opacity = 0.65 * op;
-    (this.orbitalNodes.material as THREE.PointsMaterial).opacity = 0.65 * op;
+    this.edgeMat.opacity = 0.40 * op;
+    this.ringMats.forEach((m, i) => {
+      m.opacity = (i === 2 ? 0.40 : 0.30) * op;
+    });
+    (this.orbitalNodes.material as THREE.PointsMaterial).opacity = 0.70 * op;
 
     this.group.visible = this.currentOpacity > 0.005;
 
@@ -227,28 +285,58 @@ export class ProductCore {
     this.material.uniforms.uCameraPos.value.copy(cameraPos);
 
     // ─────────────────────────────────────────────────────────────────────────
-    // MOTION DYNAMICS: Gyroscopic counter-rotations
+    // MOTION DYNAMICS: Counter-rotations & Organic Fluid Breathing
     // ─────────────────────────────────────────────────────────────────────────
-    // Main shell rotation with pointer inertia
-    this.mainMesh.rotation.y += (this.targetRotationY - this.mainMesh.rotation.y) * 0.05 + delta * 0.2;
-    this.mainMesh.rotation.x += (this.targetRotationX - this.mainMesh.rotation.x) * 0.05 + delta * 0.12;
+    // 1. Fluid organic core rotation with silky pointer inertia
+    this.mainMesh.rotation.y += (this.targetRotationY - this.mainMesh.rotation.y) * 0.05 + delta * 0.18;
+    this.mainMesh.rotation.x += (this.targetRotationX - this.mainMesh.rotation.x) * 0.05 + delta * 0.10;
 
-    // Inner nucleus fast counter-spin
-    this.innerNucleus.rotation.y -= delta * 0.7;
-    this.innerNucleus.rotation.z += delta * 0.4;
-    const pulse = 1.0 + Math.sin(elapsed * 2.5) * 0.06;
-    this.innerNucleus.scale.set(pulse, pulse, pulse);
+    // 2. Outer Geodesic Cage counter-rotates slowly & breathes
+    this.outerCage.rotation.y -= delta * 0.12;
+    this.outerCage.rotation.z += delta * 0.07;
+    const cagePulse = 1.0 + Math.sin(elapsed * 1.8) * 0.035;
+    this.outerCage.scale.set(cagePulse, cagePulse, cagePulse);
 
-    // Outer Gimbals: Multi-axis precision rotation
-    this.outerGimbal.children[0].rotation.z += delta * 0.12;
-    this.outerGimbal.children[1].rotation.x += delta * 0.09;
-    this.outerGimbal.children[2].rotation.y -= delta * 0.15;
+    // 3. Inner Quantum Nucleus fast spin & pulse
+    this.innerNucleus.rotation.y -= delta * 0.85;
+    this.innerNucleus.rotation.z += delta * 0.55;
+    const nucPulse = 1.0 + Math.sin(elapsed * 3.0) * 0.08;
+    this.innerNucleus.scale.set(nucPulse, nucPulse, nucPulse);
 
-    // Reticle micro-float
-    this.reticleGroup.rotation.z = Math.sin(elapsed * 0.8) * 0.1;
-    this.reticleGroup.position.z = Math.sin(elapsed * 2.0) * 0.05;
+    // 4. Outer Gimbals: Multi-axis gyroscopic rotation
+    this.outerGimbal.children[0].rotation.z += delta * 0.14;
+    this.outerGimbal.children[1].rotation.x += delta * 0.10;
+    this.outerGimbal.children[2].rotation.y -= delta * 0.16;
 
-    // Orbital dust slow rotation
-    this.orbitalNodes.rotation.y += delta * 0.25;
+    // Orbiting satellites rotate along rings
+    this.satelliteMeshes.forEach((sat, i) => {
+      sat.position.y = Math.sin(elapsed * (1.5 + i * 0.4)) * 0.12;
+    });
+
+    // 5. Shockwave Pulse Expansion
+    this.shockwaveRings.forEach((sw, idx) => {
+      this.shockwaveProgress[idx] += delta * 0.45;
+      if (this.shockwaveProgress[idx] > 1.0) {
+        this.shockwaveProgress[idx] = 0.0;
+      }
+      const prog = this.shockwaveProgress[idx];
+      const scale = 1.0 + prog * 1.4; // Expands from 1.0 -> 2.4
+      sw.scale.set(scale, scale, scale);
+      (sw.material as THREE.MeshBasicMaterial).opacity = Math.max(0, (1.0 - prog) * 0.35 * op);
+    });
+
+    // 6. Accretion Disc Vortex Particles
+    const posAttr = this.orbitalNodes.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const posArray = posAttr.array as Float32Array;
+
+    for (let i = 0; i < this.particleCount; i++) {
+      this.particleAngles[i] += delta * this.particleSpeeds[i];
+      const r = this.particleRadii[i] + Math.sin(elapsed * 1.2 + i) * 0.08;
+      posArray[i * 3]     = Math.cos(this.particleAngles[i]) * r;
+      posArray[i * 3 + 1] = this.particleHeights[i] + Math.sin(elapsed * 2.0 + this.particleAngles[i]) * 0.06;
+      posArray[i * 3 + 2] = Math.sin(this.particleAngles[i]) * r;
+    }
+    posAttr.needsUpdate = true;
   }
 }
+
