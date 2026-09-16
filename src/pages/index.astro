@@ -1,0 +1,57 @@
+---
+// index.astro — Official Micah 0xC Digital Experience
+import Layout from '../layouts/Layout.astro';
+import Preloader from '../components/Preloader.astro';
+import Navigation from '../components/Navigation.astro';
+import Hero from '../components/Hero.astro';
+import Intro from '../components/Intro.astro';
+import FeatureShowcase from '../components/FeatureShowcase.astro';
+import GameShowcase from '../components/GameShowcase.astro';
+import SteamSection from '../components/SteamSection.astro';
+import SystemSection from '../components/SystemSection.astro';
+import LuaSection from '../components/LuaSection.astro';
+import InteractiveShowcase from '../components/InteractiveShowcase.astro';
+import CharacterSection from '../components/CharacterSection.astro';
+import DownloadSection from '../components/DownloadSection.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout>
+  <!-- MINIMAL HEADER & 3-LINE MENU -->
+  <Navigation />
+
+  <main>
+    <!-- 02 — HERO -->
+    <Hero />
+
+    <!-- 03 — WHAT IS MICAH -->
+    <Intro />
+
+    <!-- 04 — FEATURES -->
+    <FeatureShowcase />
+
+    <!-- 05 — GAME DISCOVERY -->
+    <GameShowcase />
+
+    <!-- 06 — STEAM ECOSYSTEM -->
+    <SteamSection />
+
+    <!-- 07 — SYSTEM / PERFORMANCE -->
+    <SystemSection />
+
+    <!-- 08 — AUTOMATION / LUA -->
+    <LuaSection />
+
+    <!-- 09 — INTERACTIVE PRODUCT SHOWCASE -->
+    <InteractiveShowcase />
+
+    <!-- 10 — CHARACTER / PERSONALITY -->
+    <CharacterSection />
+
+    <!-- 11 — DOWNLOAD -->
+    <DownloadSection />
+  </main>
+
+  <!-- 12 — FOOTER -->
+  <Footer />
+</Layout>

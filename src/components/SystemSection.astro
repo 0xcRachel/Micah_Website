@@ -1,0 +1,126 @@
+﻿---
+// SystemSection.astro — Hardware Diagnostics & Low-RAM Architecture
+---
+<section id="system" class="section-wrapper system-section" data-section="system">
+  <div class="container-editorial">
+    <div class="system-header">
+      <span class="badge-tag">
+        <span class="dot"></span>
+        <span>05 // TELEMETRY HUD</span>
+      </span>
+      <h2 class="text-title anim-title">HARDWARE INTERROGATION WITHOUT MEMORY OVERHEAD.</h2>
+      <p class="system-sub text-secondary anim-fade">
+        The embedded System Info Card provides instantaneous awareness of hardware utilization. Built with Tauri 2 in Rust, the app maintains an ultralow footprint so your GPU and CPU cycles belong to your games.
+      </p>
+    </div>
+
+    <div class="telemetry-dashboard anim-fade">
+      <div class="hud-quadrant">
+        <div class="quad-header text-mono">
+          <span class="accent-signal">MONITOR 01</span>
+          <span>CPU SCHEDULER</span>
+        </div>
+        <div class="quad-stat text-mono">LOCAL WMI INTERROGATION</div>
+        <p class="quad-note text-secondary">
+          Enumerates processor topology, thread allocation, and base frequency via native Windows APIs without background polling spikes.
+        </p>
+      </div>
+
+      <div class="hud-quadrant">
+        <div class="quad-header text-mono">
+          <span class="accent-signal">MONITOR 02</span>
+          <span>RAM CONSUMPTION</span>
+        </div>
+        <div class="quad-stat text-mono">&lt; 45 MB RESIDENT RAM</div>
+        <p class="quad-note text-secondary">
+          Tauri 2 replaces bloated Electron Chromium runtimes with the lightweight OS native WebView2 control, cutting idle memory by up to 85%.
+        </p>
+      </div>
+
+      <div class="hud-quadrant">
+        <div class="quad-header text-mono">
+          <span class="accent-signal">MONITOR 03</span>
+          <span>GPU ADAPTER ENUM</span>
+        </div>
+        <div class="quad-stat text-mono">DIRECT HARDWARE ID</div>
+        <p class="quad-note text-secondary">
+          Identifies discrete and integrated graphics adapters to ensure your active graphics pipeline matches game minimum requirements.
+        </p>
+      </div>
+
+      <div class="hud-quadrant">
+        <div class="quad-header text-mono">
+          <span class="accent-signal">MONITOR 04</span>
+          <span>OS KERNEL & TOAST</span>
+        </div>
+        <div class="quad-stat text-mono">PORTAL STACKING CONTEXT</div>
+        <p class="quad-note text-secondary">
+          System toast notifications render via top-level portals into the document body, guaranteeing zero occlusion by modals or overlays.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.system-section {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.system-header {
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-bottom: 4rem;
+}
+
+.system-sub {
+  font-size: var(--font-16);
+  line-height: 1.6;
+}
+
+.telemetry-dashboard {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+@media (max-width: 860px) {
+  .telemetry-dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hud-quadrant {
+  border: 1px solid var(--border-subtle);
+  background: rgba(12, 12, 14, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.quad-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.6rem;
+}
+
+.quad-stat {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+}
+
+.quad-note {
+  font-size: 13px;
+  line-height: 1.6;
+}
+</style>

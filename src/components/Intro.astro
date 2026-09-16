@@ -1,0 +1,108 @@
+﻿---
+// Intro.astro — What is Micah 0xC (Architectural Statement)
+import { PRODUCT } from '../data/product';
+---
+<section id="intro" class="section-wrapper intro-section" data-section="intro">
+  <div class="container-editorial">
+    <div class="intro-header">
+      <span class="badge-tag">
+        <span class="dot"></span>
+        <span>01 // ARCHITECTURAL INTENT</span>
+      </span>
+      <h2 class="text-title anim-title">THE HIGH-VELOCITY GAME COMPANION BUILT ON RUST.</h2>
+    </div>
+
+    <div class="intro-statement-block anim-fade">
+      <p class="statement-large text-statement">
+        Traditional gaming utilities are bloated web wrappers consuming hundreds of megabytes of background memory. 
+        <span class="accent-signal">Micah 0xC changes the formula</span>: an ultra-compact Tauri 2 native shell engineered to run silent, consume less than 45MB of RAM, and fuse game discovery with deep Steam automation.
+      </p>
+    </div>
+
+    <div class="architecture-grid anim-fade">
+      <div class="arch-card">
+        <div class="card-num text-mono">01 // LOCAL FIRST</div>
+        <h3 class="card-title">Zero Cloud Telemetry</h3>
+        <p class="card-desc text-secondary">
+          All configuration, game libraries, and Lua manifests reside locally in your machine's app data directory. No tracking, no mandatory cloud accounts.
+        </p>
+      </div>
+
+      <div class="arch-card">
+        <div class="card-num text-mono">02 // TAURI 2 + RUST</div>
+        <h3 class="card-title">Native OS Direct Calls</h3>
+        <p class="card-desc text-secondary">
+          Powered by Rust commands using direct Windows API hooks, targeted TOML mutation, and hyper-fast async reqwest networking.
+        </p>
+      </div>
+
+      <div class="arch-card">
+        <div class="card-num text-mono">03 // NON-DESTRUCTIVE</div>
+        <h3 class="card-title">Surgical TOML Edits</h3>
+        <p class="card-desc text-secondary">
+          Modifications to Steam configuration files preserve all existing user preferences, comments, and structure without file truncation.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.intro-section {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.intro-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 3.5rem;
+}
+
+.intro-statement-block {
+  max-width: 1080px;
+  margin-bottom: 5rem;
+}
+
+.statement-large {
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.architecture-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+@media (max-width: 860px) {
+  .architecture-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.arch-card {
+  border-top: 1px solid var(--border-active);
+  padding-top: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.card-num {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.15em;
+}
+
+.card-title {
+  font-size: var(--font-20);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.card-desc {
+  font-size: var(--font-14);
+  line-height: 1.6;
+}
+</style>

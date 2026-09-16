@@ -1,0 +1,189 @@
+﻿---
+// DownloadSection.astro — Cinematic Convergence & Download Experience
+import { DOWNLOAD_DATA } from '../data/downloads';
+import { PRODUCT } from '../data/product';
+---
+<section id="download" class="section-wrapper download-section" data-section="download">
+  <div class="container-editorial download-container">
+    <div class="download-badge-wrap anim-fade">
+      <span class="badge-tag">
+        <span class="dot"></span>
+        <span>09 // FINAL CONVERGENCE</span>
+      </span>
+    </div>
+
+    <!-- Cinematic Final Invitation -->
+    <h2 class="download-headline text-hero anim-title">
+      READY TO ENTER<br />
+      <span class="accent-signal">MICAH 0xC?</span>
+    </h2>
+
+    <p class="download-sub text-statement text-secondary anim-fade">
+      Take complete ownership of your game library and Steam integration. Ultra-lightweight, local-first, zero telemetry.
+    </p>
+
+    <!-- Master Action Strip -->
+    <div class="download-cta-cluster anim-fade">
+      <a href={DOWNLOAD_DATA.primaryDownloadUrl} class="btn-magnetic btn-primary-signal master-download-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        <span>DOWNLOAD MICAH 0xC (v{DOWNLOAD_DATA.version})</span>
+      </a>
+
+      <a href={DOWNLOAD_DATA.repoUrl} target="_blank" rel="noopener noreferrer" class="btn-magnetic btn-ghost-minimal">
+        <span>VIEW GITHUB REPOSITORY</span>
+      </a>
+    </div>
+
+    <!-- Release Verification & Package Integrity Data -->
+    <div class="release-metadata-panel anim-fade">
+      <div class="meta-row">
+        <span class="meta-label text-mono">RELEASE TARGET</span>
+        <span class="meta-value text-mono">{DOWNLOAD_DATA.platform}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label text-mono">PRIMARY INSTALLER</span>
+        <span class="meta-value text-mono">{DOWNLOAD_DATA.primaryFilename}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label text-mono">ENTERPRISE MSI</span>
+        <span class="meta-value text-mono">{DOWNLOAD_DATA.msiFilename}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label text-mono">SECURITY SIGNATURE</span>
+        <span class="meta-value text-mono sig-truncate">{DOWNLOAD_DATA.shaHint}</span>
+      </div>
+    </div>
+
+    <!-- Real Release Notes Highlights from README / latest.json -->
+    <div class="release-notes-box anim-fade">
+      <div class="notes-header text-mono">
+        <span class="accent-signal">CHANGELOG HIGHLIGHTS // v{DOWNLOAD_DATA.version}</span>
+        <span>PRODUCTION VERIFIED</span>
+      </div>
+      <ul class="notes-list text-secondary">
+        {DOWNLOAD_DATA.notes.map(note => (
+          <li>{note}</li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+.download-section {
+  min-height: 120vh;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 14vh 4vw;
+}
+
+.download-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.download-headline {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.download-sub {
+  max-width: 680px;
+  line-height: 1.5;
+}
+
+.download-cta-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.master-download-btn {
+  padding: 1.3rem 2.8rem;
+  font-size: 15px;
+}
+
+.release-metadata-panel {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem 3rem;
+  width: 100%;
+  max-width: 780px;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 1.8rem 0;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .release-metadata-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+.meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.meta-label {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.14em;
+}
+
+.meta-value {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.sig-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--accent);
+}
+
+.release-notes-box {
+  width: 100%;
+  max-width: 780px;
+  background: rgba(10, 10, 12, 0.7);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 2rem;
+  text-align: left;
+}
+
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-left: 1.2rem;
+  font-size: 13px;
+  line-height: 1.5;
+}
+</style>

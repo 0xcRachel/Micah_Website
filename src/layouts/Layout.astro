@@ -1,0 +1,111 @@
+---
+// Layout.astro — Master Digital Stage Layout
+import Preloader from '../components/Preloader.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "MICAH 0xC — Game Library Manager & Steam Companion",
+  description = "A fast, lightweight desktop companion for managing your game library and Steam experience — built on Tauri + React."
+} = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph / Meta -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="/assets/icon.png" />
+
+    <!-- Typography (Inter & JetBrains Mono) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="/src/styles/global.css" />
+  </head>
+  <body data-current_section="hero" data-cursor-hover="false">
+    <!-- Cinematic Boot Preloader -->
+    <Preloader />
+
+    <!-- Custom Dual Element Cursor -->
+    <div class="cursor-dot" aria-hidden="true"></div>
+    <div class="cursor-ring" aria-hidden="true"></div>
+
+    <!-- Persistent Global WebGL Canvas Container -->
+    <div id="webgl-canvas-container" aria-hidden="true"></div>
+
+    <slot />
+
+    <!-- Client-side Orchestrator -->
+    <script>
+      import { SceneManager } from '../three/SceneManager';
+      import { initSmoothScroll } from '../animation/lenis';
+      import { initScrollNarrative } from '../animation/scrollNarrative';
+      import { initCustomCursor } from '../animation/cursor';
+      import { initTextAnimations } from '../animation/textAnimation';
+
+      // Initialize when DOM is ready
+      document.addEventListener('DOMContentLoaded', () => {
+        // Initialize Smooth Scroll with Lenis
+        const lenis = initSmoothScroll();
+
+        // Mount Global Three.js Scene Stage
+        const canvasContainer = document.getElementById('webgl-canvas-container');
+        if (canvasContainer) {
+          const sceneManager = new SceneManager(canvasContainer);
+
+          // Connect GSAP ScrollTrigger to 3D Scene Stages
+          initScrollNarrative(sceneManager);
+
+          // Menu toggle listener
+          window.addEventListener('menuToggle', ((e: CustomEvent) => {
+            sceneManager.setMenuOpen(e.detail.isOpen);
+          }) as EventListener);
+
+          // Interactive Workbench sliders
+          window.addEventListener('coreDistortion', ((e: CustomEvent) => {
+            sceneManager.productCore.setDistortion(e.detail.value);
+          }) as EventListener);
+
+          window.addEventListener('coreChroma', ((e: CustomEvent) => {
+            sceneManager.productCore.setAccentMix(e.detail.value);
+          }) as EventListener);
+
+          window.addEventListener('corePulse', () => {
+            sceneManager.productCore.setDistortion(2.2);
+            setTimeout(() => sceneManager.productCore.setDistortion(1.0), 350);
+          });
+
+          // Brand character reaction
+          window.addEventListener('characterPoke', () => {
+            sceneManager.characterStage.triggerClickReaction();
+          });
+
+          // 3D Game card deck selection listener
+          window.addEventListener('gameSelect', ((e: CustomEvent) => {
+            sceneManager.gamePlanes.setActiveCard(e.detail.index);
+          }) as EventListener);
+        }
+
+        // Initialize Custom Magnetic Cursor
+        initCustomCursor();
+
+        // Initialize Editorial Headline Animations
+        initTextAnimations();
+      });
+    </script>
+  </body>
+</html>

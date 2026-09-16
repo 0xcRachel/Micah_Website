@@ -1,0 +1,410 @@
+﻿---
+// GameShowcase.astro — Immersive Game Discovery Exhibition with Interactive 3D Deck
+---
+<section id="games" class="section-wrapper games-section" data-section="games">
+  <div class="container-editorial">
+    <div class="games-header">
+      <div class="header-tag-row">
+        <span class="badge-tag">
+          <span class="dot"></span>
+          <span>03 // DISCOVERY ENGINE</span>
+        </span>
+        <span class="deck-status text-mono">
+          <span class="live-beacon"></span>
+          SPATIAL 3D DECK // 4 MANIFESTS LOADED
+        </span>
+      </div>
+
+      <h2 class="text-title anim-title">STEAM STORE INTERROGATION & HOLOGRAPHIC SPEC SHEETS.</h2>
+      <p class="games-sub text-secondary anim-fade">
+        Query millions of titles through the Steam Store API. The camera traverses floating 3D spec sheets revealing real-time score rings, pricing valuations, and raw HTML hardware requirements.
+      </p>
+
+      <!-- Interactive 3D Game Selector Bar -->
+      <div class="game-deck-controls anim-fade">
+        <div class="deck-tabs-wrapper" id="deck-tabs">
+          <button class="game-tab-btn active btn-magnetic" data-index="0">
+            <span class="tab-index text-mono">01</span>
+            <span class="tab-title">CYBERPUNK 2077</span>
+            <span class="tab-score text-mono">88</span>
+          </button>
+          <button class="game-tab-btn btn-magnetic" data-index="1">
+            <span class="tab-index text-mono">02</span>
+            <span class="tab-title">ELDEN RING</span>
+            <span class="tab-score text-mono">94</span>
+          </button>
+          <button class="game-tab-btn btn-magnetic" data-index="2">
+            <span class="tab-index text-mono">03</span>
+            <span class="tab-title">BALDUR'S GATE 3</span>
+            <span class="tab-score text-mono">96</span>
+          </button>
+          <button class="game-tab-btn btn-magnetic" data-index="3">
+            <span class="tab-index text-mono">04</span>
+            <span class="tab-title">HOLLOW KNIGHT</span>
+            <span class="tab-score text-mono">97</span>
+          </button>
+        </div>
+
+        <div class="deck-nav-arrows">
+          <button class="arrow-btn btn-magnetic" id="btn-prev-card" aria-label="Previous Game">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+          <button class="arrow-btn btn-magnetic" id="btn-next-card" aria-label="Next Game">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active 3D Exhibition Overlay HUD Boxes -->
+    <div class="spatial-hud-grid anim-fade">
+      <div class="hud-box interactive-hud" data-cycle="1">
+        <div class="hud-corner-bracket top-l"></div>
+        <div class="hud-corner-bracket bottom-r"></div>
+        <div class="hud-header-row">
+          <span class="hud-label text-mono">ACTIVE QUERY ENGINE</span>
+          <span class="hud-tag text-mono">0xC HOOK</span>
+        </div>
+        <span class="hud-val text-mono">STEAM STORE API / REST</span>
+        <p class="hud-desc text-tertiary">Real-time title resolution with direct store page linking, category tags, and verified community ratings.</p>
+        <span class="hud-action text-mono">INSPECT PROTOCOL &rarr;</span>
+      </div>
+
+      <div class="hud-box interactive-hud" data-cycle="2">
+        <div class="hud-corner-bracket top-l"></div>
+        <div class="hud-corner-bracket bottom-r"></div>
+        <div class="hud-header-row">
+          <span class="hud-label text-mono">SPECIFICATION LIGHTBOX</span>
+          <span class="hud-tag text-mono">HTML PARSER</span>
+        </div>
+        <span class="hud-val text-mono">MIN & RECOMMENDED SPECS</span>
+        <p class="hud-desc text-tertiary">Parses raw Steam store HTML directly to extract exact GPU, CPU, and storage thresholds without telemetry lag.</p>
+        <span class="hud-action text-mono">CALCULATE DELTA &rarr;</span>
+      </div>
+
+      <div class="hud-box interactive-hud" data-cycle="3">
+        <div class="hud-corner-bracket top-l"></div>
+        <div class="hud-corner-bracket bottom-r"></div>
+        <div class="hud-header-row">
+          <span class="hud-label text-mono">FAVORITES CACHE</span>
+          <span class="hud-tag text-mono">LOCAL DB</span>
+        </div>
+        <span class="hud-val text-mono">PERSISTENT LIKE REPOSITORY</span>
+        <p class="hud-desc text-tertiary">Pin games to your local offline library with one keystroke for immediate access, offline spec viewing, and script routing.</p>
+        <span class="hud-action text-mono">SYNC FAVORITES &rarr;</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.games-section {
+  min-height: 120vh;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 12vh;
+  position: relative;
+}
+
+.games-header {
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  margin-bottom: 4rem;
+}
+
+.header-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.deck-status {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(215, 255, 0, 0.05);
+  border: 1px solid rgba(215, 255, 0, 0.2);
+  padding: 0.25rem 0.6rem;
+}
+
+.live-beacon {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: beaconPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes beaconPulse {
+  0% { opacity: 0.3; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
+.games-sub {
+  font-size: var(--font-16);
+  line-height: 1.6;
+}
+
+/* 3D Game Selector Bar */
+.game-deck-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.deck-tabs-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.game-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1.1rem;
+  background: rgba(18, 18, 22, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.game-tab-btn:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  transform: translateY(-2px);
+  background: rgba(26, 26, 32, 0.85);
+}
+
+.game-tab-btn.active {
+  border-color: var(--accent);
+  color: #000000;
+  background: var(--accent);
+  box-shadow: 0 0 20px rgba(215, 255, 0, 0.25);
+}
+
+.tab-index {
+  font-size: 10px;
+  opacity: 0.75;
+}
+
+.tab-title {
+  letter-spacing: 0.04em;
+}
+
+.tab-score {
+  font-size: 10px;
+  padding: 0.15rem 0.35rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.game-tab-btn.active .tab-score {
+  background: rgba(0, 0, 0, 0.85);
+  color: var(--accent);
+}
+
+.deck-nav-arrows {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.arrow-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(18, 18, 22, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.arrow-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(215, 255, 0, 0.08);
+}
+
+/* Spatial HUD Box Grid */
+.spatial-hud-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: auto;
+}
+
+@media (max-width: 960px) {
+  .spatial-hud-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hud-box {
+  position: relative;
+  border: 1px solid var(--border-subtle);
+  background: rgba(8, 8, 10, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+.hud-box:hover {
+  transform: translateY(-4px);
+  border-color: rgba(215, 255, 0, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(215, 255, 0, 0.08);
+}
+
+.hud-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hud-label {
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+}
+
+.hud-tag {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.1rem 0.4rem;
+}
+
+.hud-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+}
+
+.hud-desc {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.hud-action {
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  margin-top: 0.4rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.hud-box:hover .hud-action {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+.hud-corner-bracket {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-color: var(--accent);
+  border-style: solid;
+  opacity: 0.4;
+  transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+
+.top-l {
+  top: -1px; left: -1px;
+  border-width: 1px 0 0 1px;
+}
+
+.bottom-r {
+  bottom: -1px; right: -1px;
+  border-width: 0 1px 1px 0;
+}
+
+.hud-box:hover .hud-corner-bracket {
+  opacity: 1;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const tabs = document.querySelectorAll('.game-tab-btn');
+  const btnPrev = document.getElementById('btn-prev-card');
+  const btnNext = document.getElementById('btn-next-card');
+  const hudBoxes = document.querySelectorAll('.interactive-hud');
+
+  let activeIndex = 0;
+  const totalCards = 4;
+
+  function setGame(index: number) {
+    activeIndex = (index + totalCards) % totalCards;
+
+    tabs.forEach((tab, i) => {
+      if (i === activeIndex) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+
+    // Dispatch global event for Three.js GamePlanes
+    window.dispatchEvent(new CustomEvent('gameSelect', {
+      detail: { index: activeIndex }
+    }));
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const idx = parseInt(tab.getAttribute('data-index') || '0');
+      setGame(idx);
+    });
+  });
+
+  btnPrev?.addEventListener('click', () => {
+    setGame(activeIndex - 1);
+  });
+
+  btnNext?.addEventListener('click', () => {
+    setGame(activeIndex + 1);
+  });
+
+  // Clicking HUD boxes also smoothly cycles the 3D card deck
+  hudBoxes.forEach((box) => {
+    box.addEventListener('click', () => {
+      const cycleIdx = parseInt(box.getAttribute('data-cycle') || '1');
+      setGame(cycleIdx % totalCards);
+    });
+  });
+});
+</script>

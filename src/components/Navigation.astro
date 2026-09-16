@@ -1,0 +1,307 @@
+﻿---
+// Navigation.astro — Minimal Editorial Top Bar + 3-line to X Menu Overlay
+import { PRODUCT } from '../data/product';
+---
+<header class="site-header">
+  <div class="nav-container">
+    <a href="#hero" class="brand-link">
+      <span class="brand-mark">0xC</span>
+      <span class="brand-title text-mono">MICAH 0xC</span>
+    </a>
+
+    <nav class="desktop-nav">
+      <a href="#intro" class="nav-link text-mono">PRODUCT</a>
+      <a href="#features" class="nav-link text-mono">FEATURES</a>
+      <a href="#games" class="nav-link text-mono">DISCOVERY</a>
+      <a href="#steam" class="nav-link text-mono">STEAM</a>
+      <a href="#system" class="nav-link text-mono">SYSTEM</a>
+      <a href="#lua" class="nav-link text-mono">LUA</a>
+      <a href="#download" class="nav-link text-mono accent-signal">DOWNLOAD</a>
+    </nav>
+
+    <div class="nav-right">
+      <div class="status-indicator">
+        <span class="status-dot"></span>
+        <span class="status-label text-mono">v{PRODUCT.version}</span>
+      </div>
+
+      <button id="menu-toggle" class="menu-btn btn-magnetic" aria-label="Toggle Menu">
+        <span class="menu-line line-1"></span>
+        <span class="menu-line line-2"></span>
+        <span class="menu-line line-3"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Cinematic Fullscreen Menu Overlay -->
+<div id="cinematic-menu" class="menu-overlay" aria-hidden="true">
+  <div class="menu-backdrop"></div>
+  <div class="menu-content container-editorial">
+    <div class="menu-meta text-mono text-tertiary">
+      <span>INDEX // DIRECTORY</span>
+      <span>TAURI 2 ARCHITECTURE</span>
+    </div>
+    <div class="menu-links">
+      <a href="#hero" class="menu-item"><span class="item-num text-mono">01</span><span class="item-text">OVERVIEW</span></a>
+      <a href="#intro" class="menu-item"><span class="item-num text-mono">02</span><span class="item-text">WHAT IS MICAH</span></a>
+      <a href="#features" class="menu-item"><span class="item-num text-mono">03</span><span class="item-text">CAPABILITIES</span></a>
+      <a href="#games" class="menu-item"><span class="item-num text-mono">04</span><span class="item-text">GAME DISCOVERY</span></a>
+      <a href="#steam" class="menu-item"><span class="item-num text-mono">05</span><span class="item-text">STEAM CONTROL</span></a>
+      <a href="#system" class="menu-item"><span class="item-num text-mono">06</span><span class="item-text">HARDWARE TELEMETRY</span></a>
+      <a href="#lua" class="menu-item"><span class="item-num text-mono">07</span><span class="item-text">LUA HOT-RELOAD</span></a>
+      <a href="#character" class="menu-item"><span class="item-num text-mono">08</span><span class="item-text">CHARACTER</span></a>
+      <a href="#download" class="menu-item item-highlight"><span class="item-num text-mono">09</span><span class="item-text">GET MICAH 0xC</span></a>
+    </div>
+    <div class="menu-footer text-mono text-tertiary">
+      <span>WINDOWS 64-BIT // LOCAL-FIRST</span>
+      <span>OPEN SOURCE</span>
+    </div>
+  </div>
+</div>
+
+<style>
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 80px;
+  z-index: var(--z-nav);
+  pointer-events: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.nav-container {
+  width: 100%;
+  height: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 3vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: auto;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.brand-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 2.2rem;
+}
+
+@media (max-width: 992px) {
+  .desktop-nav {
+    display: none;
+  }
+}
+
+.nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  transition: color 0.2s ease;
+  position: relative;
+  padding: 0.2rem 0;
+}
+
+.nav-link:hover {
+  color: var(--text-primary);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent);
+}
+
+/* 3-Line to X Menu Button */
+.menu-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  padding: 0;
+}
+
+.menu-line {
+  width: 20px;
+  height: 1.5px;
+  background: var(--text-primary);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  transform-origin: center;
+}
+
+/* Open State Animation: 3 lines -> X */
+.menu-btn.is-active .line-1 {
+  transform: translateY(7.5px) rotate(45deg);
+}
+
+.menu-btn.is-active .line-2 {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.menu-btn.is-active .line-3 {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+/* Fullscreen Overlay */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: var(--z-overlay);
+  background: rgba(0, 0, 0, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.menu-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.menu-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 80vh;
+  padding: 4rem 2rem;
+}
+
+.menu-meta, .menu-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 1rem 0;
+}
+
+.menu-links {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem 4rem;
+}
+
+@media (max-width: 768px) {
+  .menu-links {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+}
+
+.menu-item {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: clamp(20px, 3.2vw, 38px);
+  font-weight: 700;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.menu-item .item-num {
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+.menu-item:hover {
+  color: var(--text-primary);
+  transform: translateX(8px);
+}
+
+.menu-item.item-highlight:hover {
+  color: var(--accent);
+}
+</style>
+
+<script>
+const toggle = document.getElementById('menu-toggle');
+const overlay = document.getElementById('cinematic-menu');
+const links = document.querySelectorAll('.menu-item');
+
+if (toggle && overlay) {
+  toggle.addEventListener('click', () => {
+    const isOpen = toggle.classList.toggle('is-active');
+    overlay.classList.toggle('is-open', isOpen);
+    overlay.setAttribute('aria-hidden', String(!isOpen));
+
+    // Notify WebGL SceneManager via custom event
+    window.dispatchEvent(new CustomEvent('menuToggle', { detail: { isOpen } }));
+  });
+
+  links.forEach(l => {
+    l.addEventListener('click', () => {
+      toggle.classList.remove('is-active');
+      overlay.classList.remove('is-open');
+      overlay.setAttribute('aria-hidden', 'true');
+      window.dispatchEvent(new CustomEvent('menuToggle', { detail: { isOpen: false } }));
+    });
+  });
+}
+</script>

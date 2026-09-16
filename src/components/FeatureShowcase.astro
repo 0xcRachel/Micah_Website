@@ -1,0 +1,152 @@
+﻿---
+// FeatureShowcase.astro — 6 Core Features with Architectural Motion Profiles
+import { FEATURES } from '../data/features';
+---
+<section id="features" class="section-wrapper features-section" data-section="features">
+  <div class="container-editorial">
+    <div class="features-header">
+      <span class="badge-tag">
+        <span class="dot"></span>
+        <span>02 // CORE CAPABILITIES</span>
+      </span>
+      <h2 class="text-title anim-title">ENGINEERED FOR CONTROL, PRECISION AND SPEED.</h2>
+      <p class="features-sub text-secondary anim-fade">
+        Six foundational subsystems purpose-built to eliminate friction across your game library.
+      </p>
+    </div>
+
+    <div class="features-matrix">
+      {FEATURES.map((f, idx) => (
+        <div class="feature-item anim-fade" data-motion-type={f.motionTag}>
+          <div class="feature-top">
+            <span class="feature-cat text-mono">{f.category}</span>
+            <span class="feature-motion text-mono text-tertiary">[{f.motionTag}]</span>
+          </div>
+
+          <div class="feature-content">
+            <h3 class="feature-title">{f.title}</h3>
+            <p class="feature-subtitle text-mono accent-signal">{f.subtitle}</p>
+            <p class="feature-desc text-secondary">{f.description}</p>
+          </div>
+
+          <div class="feature-specs-list">
+            {f.specs.map(s => (
+              <div class="spec-row text-mono">
+                <span class="spec-bullet">/</span>
+                <span>{s}</span>
+              </div>
+            ))}
+          </div>
+
+          <div class="feature-footer-line"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+.features-section {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.features-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 4rem;
+}
+
+.features-sub {
+  font-size: var(--font-16);
+  max-width: 680px;
+}
+
+.features-matrix {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3.5rem 4rem;
+}
+
+@media (max-width: 900px) {
+  .features-matrix {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.feature-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.8rem;
+}
+
+.feature-cat {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.15em;
+}
+
+.feature-motion {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+.feature-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.feature-title {
+  font-size: var(--font-24);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.feature-subtitle {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.feature-desc {
+  font-size: var(--font-14);
+  line-height: 1.6;
+}
+
+.feature-specs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.spec-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.spec-bullet {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.feature-footer-line {
+  width: 100%;
+  height: 1px;
+  background: var(--border-subtle);
+  margin-top: 1rem;
+}
+</style>

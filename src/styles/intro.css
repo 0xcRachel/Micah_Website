@@ -1,0 +1,215 @@
+/* ===================================================================
+   INTRO / PRELOADER - Full Cinematic Loading Experience
+   Visual hierarchy: BLACK -> WHITE -> GREY -> tiny LIME SIGNAL
+   =================================================================== */
+
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: transparent;
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+#intro-overlay.intro-done {
+  display: none !important;
+  pointer-events: none;
+}
+
+.intro-hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.intro-visible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transition: opacity 0.85s ease;
+}
+
+/* MICRO SIGNAL DOT - first tiny element at 0.25s */
+.intro-signal-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  background: #ffffff;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0);
+}
+
+/* CORNER LABEL - low-weight system text during loading */
+.intro-corner {
+  position: absolute;
+  bottom: 2.4rem;
+  left: 2.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  opacity: 0;
+}
+
+.intro-corner-glyph {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: #2a2a2a;
+  text-transform: uppercase;
+}
+
+.intro-corner-state {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  color: #1e1e1e;
+  text-transform: uppercase;
+}
+
+/* LIME SIGNAL - SYSTEM ONLINE. Used ONCE only. */
+.intro-lime-signal {
+  position: absolute;
+  top: 2.2rem;
+  right: 2.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0;
+}
+
+.intro-lime-dot {
+  display: block;
+  width: 5px;
+  height: 5px;
+  background: #d7ff00;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(215, 255, 0, 0.6);
+  animation: limePulse 1.8s ease-in-out infinite;
+}
+
+.intro-lime-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: #d7ff00;
+  text-transform: uppercase;
+}
+
+@keyframes limePulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+/* TYPOGRAPHY WRAP - MICAH 0xC reveal */
+.intro-typography-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  transform: translateX(-50%);
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.intro-logo-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0;
+}
+
+.intro-char {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(3.2rem, 6.5vw, 6.8rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  line-height: 1;
+  opacity: 0;
+  transform: translateY(48px) rotateX(18deg);
+  filter: blur(6px);
+  will-change: transform, opacity, filter;
+  transform-style: preserve-3d;
+}
+
+.intro-char-space {
+  display: inline-block;
+  width: 0.32em;
+}
+
+.intro-tagline {
+  margin-top: 1.1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(0.7rem, 1.1vw, 0.88rem);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: #6a6a6a;
+  opacity: 0;
+  transform: translateY(14px);
+  will-change: transform, opacity;
+}
+
+/* CURTAIN - slides away at the end revealing the WebGL world */
+#intro-curtain {
+  position: absolute;
+  inset: 0;
+  background: #000000;
+  transform-origin: top center;
+  will-change: transform;
+}
+
+/* HORIZONTAL HAIRLINES - depth suggestion */
+.intro-hairline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255,255,255,0.035) 20%,
+    rgba(255,255,255,0.065) 50%,
+    rgba(255,255,255,0.035) 80%,
+    transparent 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-hairline:nth-child(1) { top: 33%; }
+.intro-hairline:nth-child(2) { top: 50%; }
+.intro-hairline:nth-child(3) { top: 67%; }
+
+/* REDUCED MOTION */
+@media (prefers-reduced-motion: reduce) {
+  .intro-char {
+    transform: none !important;
+    filter: none !important;
+  }
+  .intro-tagline {
+    transform: none !important;
+  }
+  @keyframes limePulse { 0%, 100% { opacity: 1; } }
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .intro-typography-wrap {
+    left: 6vw;
+    right: 6vw;
+    transform: none;
+    white-space: normal;
+    text-align: left;
+    bottom: 18%;
+  }
+  .intro-char { font-size: clamp(2.6rem, 10vw, 4rem); }
+  .intro-corner { bottom: 1.4rem; left: 1.4rem; }
+  .intro-lime-signal { top: 1.4rem; right: 1.4rem; }
+}

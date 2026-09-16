@@ -1,0 +1,151 @@
+﻿---
+// Footer.astro — Minimal Dark Technical Footer
+import { PRODUCT } from '../data/product';
+import { DOWNLOAD_DATA } from '../data/downloads';
+---
+<footer class="site-footer">
+  <div class="container-editorial footer-layout">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <span class="brand-code text-mono">0xC</span>
+        <span class="brand-name text-mono">MICAH 0xC</span>
+        <p class="brand-sub text-tertiary">Game Library Manager & Steam Companion</p>
+      </div>
+
+      <div class="footer-nav">
+        <div class="footer-nav-col">
+          <span class="col-head text-mono">SUBSYSTEMS</span>
+          <a href="#intro" class="footer-link">Product Architecture</a>
+          <a href="#features" class="footer-link">Features & Matrix</a>
+          <a href="#games" class="footer-link">Steam Discovery</a>
+          <a href="#steam" class="footer-link">Steam Manager</a>
+        </div>
+
+        <div class="footer-nav-col">
+          <span class="col-head text-mono">RESOURCES</span>
+          <a href={DOWNLOAD_DATA.repoUrl} target="_blank" rel="noopener noreferrer" class="footer-link">GitHub Repository</a>
+          <a href={`${DOWNLOAD_DATA.repoUrl}/releases`} target="_blank" rel="noopener noreferrer" class="footer-link">Releases & Builds</a>
+          <a href="#system" class="footer-link">System Diagnostics</a>
+          <a href="#lua" class="footer-link">Manifest Hub & Lua</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom text-mono text-tertiary">
+      <div class="bottom-left">
+        <span>© 2026 MICAH 0xC // OPEN SOURCE</span>
+        <span>ENGINEERED ON TAURI 2 (RUST) + REACT 19</span>
+      </div>
+      <div class="bottom-right">
+        <span>LOCAL-FIRST // NO TRACKING</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+.site-footer {
+  border-top: 1px solid var(--border-subtle);
+  background: #000000;
+  padding: 6rem 0 3rem 0;
+  position: relative;
+  z-index: var(--z-content);
+}
+
+.footer-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 3rem;
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.brand-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.brand-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--text-primary);
+}
+
+.brand-sub {
+  font-size: 12px;
+}
+
+.footer-nav {
+  display: flex;
+  gap: 4rem;
+}
+
+@media (max-width: 600px) {
+  .footer-nav {
+    flex-direction: column;
+    gap: 2rem;
+  }
+}
+
+.footer-nav-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.col-head {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.14em;
+  margin-bottom: 0.4rem;
+}
+
+.footer-link {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: var(--accent);
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 2rem;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.bottom-left {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+</style>

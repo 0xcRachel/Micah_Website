@@ -1,0 +1,381 @@
+﻿---
+// Preloader.astro — Enhanced Cinematic Kernel Boot Sequence
+---
+<div id="cinematic-preloader" class="preloader-overlay">
+  <!-- Subtle Background Grid & Radar Sweep -->
+  <div class="preloader-grid" aria-hidden="true"></div>
+  <div class="preloader-scanline" aria-hidden="true"></div>
+
+  <!-- Corner Aerospace HUD Markers -->
+  <div class="hud-corner top-left" aria-hidden="true">
+    <span class="hud-bracket">[</span>
+    <span class="hud-text">SYS.BOOT // REV.0xC</span>
+  </div>
+  <div class="hud-corner top-right" aria-hidden="true">
+    <span class="hud-text">ARCH: WIN_X64 // RUST-TAURI</span>
+    <span class="hud-bracket">]</span>
+  </div>
+  <div class="hud-corner bottom-left" aria-hidden="true">
+    <span class="hud-bracket">[</span>
+    <span class="hud-text">MEM_PROFILE: &lt; 45 MB</span>
+  </div>
+  <div class="hud-corner bottom-right" aria-hidden="true">
+    <span class="hud-text" id="hud-hex-counter">ADDR: 0x0000 // STANDBY</span>
+    <span class="hud-bracket">]</span>
+  </div>
+
+  <div class="preloader-content">
+    <!-- Reticle + Octagonal Geometric Core -->
+    <div class="glyph-container">
+      <!-- Outer Orbiting Compass Ring with Ticks -->
+      <svg class="reticle-ring" viewBox="0 0 140 140" width="140" height="140">
+        <circle cx="70" cy="70" r="66" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+        <circle cx="70" cy="70" r="66" fill="none" stroke="#d7ff00" stroke-width="1.5" stroke-dasharray="16 280" class="orbit-tick" />
+        <!-- Crosshairs -->
+        <line x1="70" y1="0" x2="70" y2="8" stroke="rgba(255, 255, 255, 0.25)" stroke-width="1" />
+        <line x1="70" y1="132" x2="70" y2="140" stroke="rgba(255, 255, 255, 0.25)" stroke-width="1" />
+        <line x1="0" y1="70" x2="8" y2="70" stroke="rgba(255, 255, 255, 0.25)" stroke-width="1" />
+        <line x1="132" y1="70" x2="140" y2="70" stroke="rgba(255, 255, 255, 0.25)" stroke-width="1" />
+      </svg>
+
+      <!-- Signature Octagonal SVG Core -->
+      <svg class="boot-glyph" viewBox="0 0 100 100" width="88" height="88">
+        <!-- Octagonal Outer Shield -->
+        <polygon class="glyph-outer" points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="none" stroke="#bababa" stroke-width="1.5" />
+        <!-- Octagonal Inner Accent Core -->
+        <polygon class="glyph-inner" points="36,20 64,20 80,36 80,64 64,80 36,80 20,64 20,36" fill="none" stroke="#d7ff00" stroke-width="2" />
+        <!-- Luminous Quantum Seed -->
+        <circle cx="50" cy="50" r="6" fill="#ffffff" class="glyph-core" />
+      </svg>
+
+      <!-- Soft Radial Core Glow -->
+      <div class="core-aura" aria-hidden="true"></div>
+    </div>
+
+    <!-- Telemetry & Boot Status Readout -->
+    <div class="boot-text-wrapper">
+      <div class="boot-title-row">
+        <span class="boot-signal-dot"></span>
+        <span class="boot-title text-mono">MICAH 0xC // KERNEL BOOT</span>
+      </div>
+      <div class="boot-status text-mono" id="boot-status-text">INITIALIZING SUBSYSTEMS...</div>
+      
+      <!-- High-precision Telemetry Runner Bar -->
+      <div class="telemetry-bar-wrap">
+        <div class="telemetry-bar-fill" id="telemetry-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flash beam shutter line for exit reveal -->
+  <div class="shutter-beam" id="shutter-beam" aria-hidden="true"></div>
+</div>
+
+<style>
+.preloader-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #030304;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  overflow: hidden;
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.85s;
+}
+
+/* Subtle Sci-Fi Grid */
+.preloader-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+  pointer-events: none;
+}
+
+/* Horizontal Radar Sweep */
+.preloader-scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(215, 255, 0, 0.4), transparent);
+  animation: scanlineMove 2.2s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scanlineMove {
+  0% { transform: translateY(-10vh); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(110vh); opacity: 0; }
+}
+
+/* Corner HUD Brackets */
+.hud-corner {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: #4a4a4a;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hud-bracket {
+  color: #d7ff00;
+  font-weight: 700;
+  opacity: 0.6;
+}
+
+.top-left { top: 2rem; left: 2.2rem; }
+.top-right { top: 2rem; right: 2.2rem; }
+.bottom-left { bottom: 2rem; left: 2.2rem; }
+.bottom-right { bottom: 2rem; right: 2.2rem; }
+
+/* Content Alignment */
+.preloader-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.4rem;
+  z-index: 2;
+}
+
+/* Glyph & Ring Container */
+.glyph-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Outer Orbiting Ring */
+.reticle-ring {
+  position: absolute;
+  inset: 0;
+  animation: reticleSpin 12s linear infinite;
+}
+
+.orbit-tick {
+  animation: tickPulse 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes reticleSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes tickPulse {
+  0% { stroke: #d7ff00; opacity: 0.4; }
+  100% { stroke: #ffffff; opacity: 0.9; }
+}
+
+/* Signature Octagonal Glyph Animations */
+.boot-glyph {
+  position: relative;
+  z-index: 2;
+}
+
+.glyph-outer {
+  stroke-dasharray: 280;
+  stroke-dashoffset: 280;
+  animation: drawGlyph 1.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.glyph-inner {
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  animation: drawGlyph 1.1s cubic-bezier(0.25, 1, 0.5, 1) 0.25s forwards;
+}
+
+.glyph-core {
+  opacity: 0;
+  transform-origin: center;
+  animation: pulseCore 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.75s forwards;
+}
+
+.core-aura {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(215, 255, 0, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: auraBreathe 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes drawGlyph {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes pulseCore {
+  0% { opacity: 0; transform: scale(0.2); }
+  100% { opacity: 1; transform: scale(1.0); }
+}
+
+@keyframes auraBreathe {
+  0%, 100% { transform: scale(0.9); opacity: 0.35; }
+  50% { transform: scale(1.3); opacity: 0.75; }
+}
+
+/* Boot Text Wrapper */
+.boot-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.boot-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.boot-signal-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #d7ff00;
+  box-shadow: 0 0 6px #d7ff00;
+  animation: signalBlink 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes signalBlink {
+  0% { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+
+.boot-title {
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  color: #ffffff;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.boot-status {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: #7e7e7e;
+  font-family: 'JetBrains Mono', monospace;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.boot-status.status-ready {
+  color: #d7ff00;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(215, 255, 0, 0.4);
+}
+
+/* Telemetry Progress Bar */
+.telemetry-bar-wrap {
+  width: 160px;
+  height: 1.5px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-top: 0.4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.telemetry-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #7e7e7e, #d7ff00);
+  box-shadow: 0 0 8px rgba(215, 255, 0, 0.6);
+  transition: width 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Exit Shutter Beam */
+.shutter-beam {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: #d7ff00;
+  box-shadow: 0 0 16px #d7ff00, 0 0 30px #d7ff00;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.preloader-overlay.is-beaming .shutter-beam {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.preloader-overlay.is-loaded {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+</style>
+
+<script>
+function initPreloader() {
+  const preloader = document.getElementById('cinematic-preloader');
+  const status = document.getElementById('boot-status-text');
+  const fill = document.getElementById('telemetry-fill');
+  const hexCounter = document.getElementById('hud-hex-counter');
+
+  // Sequence of realistic kernel telemetry steps
+  const steps = [
+    { text: "TAURI_CORE // MOUNTING RUNTIME...", progress: "25%", hex: "ADDR: 0x00A1 // SYNC" },
+    { text: "HARDWARE_HOOK // WMI PROBE OK", progress: "55%", hex: "ADDR: 0x00B8 // VULKAN" },
+    { text: "STEAM_PIPE // MANIFEST LINKED", progress: "80%", hex: "ADDR: 0x00C4 // ACTIVE" },
+    { text: "STAGE SYNCHRONIZED — READY", progress: "100%", hex: "ADDR: 0x000C // 0xC CORE" }
+  ];
+
+  let currentStep = 0;
+  const interval = setInterval(() => {
+    currentStep++;
+    if (currentStep < steps.length) {
+      if (status) status.innerText = steps[currentStep].text;
+      if (fill) fill.style.width = steps[currentStep].progress;
+      if (hexCounter) hexCounter.innerText = steps[currentStep].hex;
+      
+      if (currentStep === steps.length - 1 && status) {
+        status.classList.add('status-ready');
+      }
+    } else {
+      clearInterval(interval);
+      
+      // Step: Trigger razor beam flash
+      if (preloader) preloader.classList.add('is-beaming');
+
+      // Final step: Fade out preloader cleanly
+      setTimeout(() => {
+        if (preloader) preloader.classList.add('is-loaded');
+      }, 350);
+    }
+  }, 420);
+}
+
+if (document.readyState === 'complete') {
+  initPreloader();
+} else {
+  window.addEventListener('load', initPreloader);
+}
+</script>

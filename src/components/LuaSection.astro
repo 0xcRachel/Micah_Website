@@ -1,0 +1,167 @@
+---
+// LuaSection.astro — Zero-Restart Lua Automation Pipeline
+import { PRODUCT } from '../data/product';
+---
+<section id="lua" class="section-wrapper lua-section" data-section="lua">
+  <div class="container-editorial">
+    <div class="lua-header">
+      <span class="badge-tag">
+        <span class="dot"></span>
+        <span>06 // SCRIPT AUTOMATION</span>
+      </span>
+      <h2 class="text-title anim-title">ZERO-RESTART LUA HOT-RELOAD PIPELINE.</h2>
+      <p class="lua-sub text-secondary anim-fade">
+        The auto-import pipeline synchronizes scripts from GitHub Manifest Hub directly to Steam's internal file watcher. Modify scripts, update configurations, and observe game hooks apply immediately.
+      </p>
+    </div>
+
+    <!-- 5-Step Linear Architecture Flow -->
+    <div class="pipeline-stepper anim-fade">
+      {PRODUCT.manifestPipeline.map((p, idx) => (
+        <div class="stepper-node">
+          <div class="node-meta text-mono">
+            <span class="node-step accent-signal">{p.step}</span>
+            <span class="node-title">{p.title}</span>
+          </div>
+          <p class="node-desc text-secondary">{p.description}</p>
+          {idx < PRODUCT.manifestPipeline.length - 1 && (
+            <div class="node-connector" aria-hidden="true">→</div>
+          )}
+        </div>
+      ))}
+    </div>
+
+    <!-- Realistic Code Sample & Path Reference -->
+    <div class="code-terminal-spec anim-fade">
+      <div class="terminal-header text-mono">
+        <div class="terminal-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="terminal-title">manager.rs // auto_save_and_import_lua</span>
+        <span class="terminal-tag text-tertiary">RUST TAURI 2</span>
+      </div>
+      <pre class="terminal-body text-mono"><code><span class="c-comment">// Fetch Lua from Manifest Hub (branch ref=&lt;appid&gt;) and link to Steam config</span>
+<span class="c-kw">pub async fn</span> <span class="c-fn">auto_save_and_import_lua</span>(app_id: &amp;<span class="c-type">str</span>, game_name: &amp;<span class="c-type">str</span>) -&gt; <span class="c-type">Result</span>&lt;(), <span class="c-type">String</span>&gt; &#123;
+    <span class="c-kw">let</span> target_file = <span class="c-macro">format!</span>(<span class="c-str">"&#123;&#125;_&#123;&#125;.lua"</span>, app_id, sanitize_filename(game_name));
+    <span class="c-kw">let</span> dest_path = steam_lua_dir.join(<span class="c-macro">format!</span>(<span class="c-str">"&#123;&#125;.lua"</span>, app_id));
+    
+    <span class="c-comment">// Register into micah_mode.toml [lua] paths via surgical string splice</span>
+    register_lua_path_surgical(&amp;dest_path)?;
+    <span class="c-comment">// DLL file watcher hot-reloads instantly — NO STEAM RESTART REQUIRED</span>
+    <span class="c-kw">Ok</span>(())
+&#125;</code></pre>
+    </div>
+  </div>
+</section>
+
+<style>
+.lua-section {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.lua-header {
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-bottom: 4rem;
+}
+
+.lua-sub {
+  font-size: var(--font-16);
+  line-height: 1.6;
+}
+
+.pipeline-stepper {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+}
+
+@media (max-width: 960px) {
+  .pipeline-stepper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stepper-node {
+  border-top: 2px solid var(--accent);
+  padding-top: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  position: relative;
+}
+
+.node-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.node-step {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+}
+
+.node-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+}
+
+.node-desc {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.node-connector {
+  display: none;
+}
+
+.code-terminal-spec {
+  border: 1px solid var(--border-subtle);
+  background: rgba(10, 10, 12, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.4rem;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 11px;
+}
+
+.terminal-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.terminal-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.terminal-body {
+  padding: 1.8rem;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #bababa;
+  overflow-x: auto;
+}
+
+.c-comment { color: #666666; font-style: italic; }
+.c-kw { color: #d7ff00; font-weight: 600; }
+.c-fn { color: #ffffff; font-weight: 600; }
+.c-type { color: #aaaaaa; }
+.c-str { color: #bababa; }
+.c-macro { color: #d7ff00; }
+</style>

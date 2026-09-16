@@ -1,0 +1,182 @@
+﻿---
+// SteamSection.astro — 5-Tab Steam Control Panel & Integration Lifecycle
+import { STEAM_TABS } from '../data/features';
+---
+<section id="steam" class="section-wrapper steam-section" data-section="steam">
+  <div class="container-editorial">
+    <div class="steam-header">
+      <span class="badge-tag">
+        <span class="dot"></span>
+        <span>04 // SYSTEM HOOKS</span>
+      </span>
+      <h2 class="text-title anim-title">THE 5-TAB STEAM INTEGRATION SUITE.</h2>
+      <p class="steam-sub text-secondary anim-fade">
+        Direct management of Steam's runtime environment. Auto-detect directory paths, manage DLL injection lifecycles across 4 distinct states, and inspect execution logs in real time.
+      </p>
+    </div>
+
+    <div class="steam-tabs-table anim-fade">
+      <div class="table-header text-mono">
+        <span>TAB</span>
+        <span>ROLE & LIFECYCLE</span>
+        <span>STATE INDICATORS</span>
+        <span>DOMAIN ARCHITECTURE</span>
+      </div>
+
+      {STEAM_TABS.map(t => (
+        <div class="table-row">
+          <div class="tab-col-name text-mono">
+            <span class="tab-badge">{t.tab}</span>
+          </div>
+          <div class="tab-col-role">
+            <strong class="role-title">{t.role}</strong>
+          </div>
+          <div class="tab-col-states">
+            {t.states.map(s => (
+              <span class="state-pill text-mono">{s}</span>
+            ))}
+          </div>
+          <div class="tab-col-desc text-secondary">
+            {t.desc}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="toml-pipeline-box anim-fade">
+      <div class="box-top text-mono">
+        <span class="accent-signal">ARCHITECTURE HIGHLIGHT // NON-DESTRUCTIVE CONFIG</span>
+        <span>SURGICAL TOML MUTATION</span>
+      </div>
+      <p class="toml-desc text-secondary">
+        Instead of serializing and rewriting the entire <code>micah_mode.toml</code> document—which would wipe out user comments and custom sections—Micah 0xC executes targeted string splicing directly against the AST. Your custom parameters remain untouched.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+.steam-section {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.steam-header {
+  max-width: 840px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-bottom: 4rem;
+}
+
+.steam-sub {
+  font-size: var(--font-16);
+  line-height: 1.6;
+}
+
+.steam-tabs-table {
+  border: 1px solid var(--border-subtle);
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 3rem;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 140px 220px 280px 1fr;
+  padding: 1.2rem 2rem;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.15em;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+@media (max-width: 960px) {
+  .table-header {
+    display: none;
+  }
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 140px 220px 280px 1fr;
+  align-items: center;
+  padding: 1.4rem 2rem;
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 1rem;
+}
+
+@media (max-width: 960px) {
+  .table-row {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+    padding: 1.5rem;
+  }
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.tab-badge {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  border-left: 2px solid var(--accent);
+  padding-left: 0.6rem;
+}
+
+.role-title {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.tab-col-states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.state-pill {
+  font-size: 10px;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-tertiary);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tab-col-desc {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.toml-pipeline-box {
+  border: 1px solid var(--border-active);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.box-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.toml-desc {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.toml-desc code {
+  color: var(--accent);
+  background: rgba(215, 255, 0, 0.08);
+  padding: 0.1rem 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+</style>

@@ -1,0 +1,207 @@
+﻿---
+// Hero.astro — Editorial Product Launch Hero
+import { PRODUCT } from '../data/product';
+import { DOWNLOAD_DATA } from '../data/downloads';
+---
+<section id="hero" class="section-wrapper hero-section" data-section="hero">
+  <div class="container-editorial hero-layout">
+    <div class="hero-text-block">
+      <!-- Section Indicator -->
+      <div class="badge-tag hero-badge">
+        <span class="dot"></span>
+        <span>OFFICIAL RELEASE // {PRODUCT.version}</span>
+      </div>
+
+      <!-- Grand Editorial Headline -->
+      <h1 class="hero-headline text-hero">
+        <span class="hero-word">YOUR</span>
+        <span class="hero-word">GAMES.</span><br />
+        <span class="hero-word">YOUR</span>
+        <span class="hero-word">RULES.</span><br />
+        <span class="hero-word accent-signal">ONE</span>
+        <span class="hero-word">HUB.</span>
+      </h1>
+
+      <!-- Supporting Editorial Subtitle from README -->
+      <p class="hero-sub text-statement text-secondary">
+        {PRODUCT.heroSub}
+      </p>
+
+      <!-- Action Cluster -->
+      <div class="hero-actions">
+        <a href="#download" class="btn-magnetic btn-primary-signal hero-cta">
+          <span>DOWNLOAD FOR WINDOWS</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M7 17L17 7M17 7H7M17 7V17" />
+          </svg>
+        </a>
+
+        <a href="#intro" class="btn-magnetic btn-ghost-minimal">
+          <span>EXPLORE ARCHITECTURE</span>
+        </a>
+      </div>
+
+      <!-- Real Metrics Grid from README -->
+      <div class="hero-metrics-strip">
+        {PRODUCT.metrics.map(m => (
+          <div class="hero-metric-pill">
+            <span class="metric-val text-mono">{m.value}</span>
+            <span class="metric-lbl text-mono">{m.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- 3D Spatial Canvas Anchor -->
+    <div class="hero-stage-anchor" aria-hidden="true">
+      <div class="spatial-focus-indicator">
+        <span class="crosshair top-left"></span>
+        <span class="crosshair top-right"></span>
+        <span class="crosshair bottom-left"></span>
+        <span class="crosshair bottom-right"></span>
+        <div class="focus-label text-mono">INTERACTIVE 3D CORE // LERP TRACKING</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.hero-section {
+  min-height: 100vh;
+  padding-top: 140px;
+  display: flex;
+  align-items: center;
+}
+
+.hero-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 4vw;
+}
+
+@media (max-width: 992px) {
+  .hero-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hero-text-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2rem;
+  z-index: 2;
+}
+
+.hero-badge {
+  margin-bottom: 0.5rem;
+}
+
+.hero-headline {
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  display: block;
+}
+
+.hero-word {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}
+
+.hero-sub {
+  max-width: 620px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.4rem;
+  margin-top: 0.5rem;
+}
+
+.hero-metrics-strip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem 2.4rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-subtle);
+  width: 100%;
+  max-width: 640px;
+}
+
+@media (max-width: 540px) {
+  .hero-metrics-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hero-metric-pill {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.metric-val {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+}
+
+.metric-lbl {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.12em;
+}
+
+/* Spatial Focus Framing in 3D Zone */
+.hero-stage-anchor {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+@media (max-width: 992px) {
+  .hero-stage-anchor {
+    display: none;
+  }
+}
+
+.spatial-focus-indicator {
+  position: relative;
+  width: 380px;
+  height: 380px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.crosshair {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: rgba(255, 255, 255, 0.3);
+  border-style: solid;
+}
+
+.top-left { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+.top-right { top: -1px; right: -1px; border-width: 1px 1px 0 0; }
+.bottom-left { bottom: -1px; left: -1px; border-width: 0 0 1px 1px; }
+.bottom-right { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+
+.focus-label {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.14em;
+}
+</style>
