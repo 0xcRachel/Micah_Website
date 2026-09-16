@@ -42,13 +42,13 @@ export class CharacterStage {
     // ─────────────────────────────────────────────────────────────────────────
     this.group.position.set(1.45, 0.0, 0);
 
-    // 1. Texture loader for official dark mode character asset
+    // 1. Texture loader for official character asset (angel pink - char_1)
     const textureLoader = new THREE.TextureLoader();
-    const charTexture = textureLoader.load('/assets/dark_mode_char.png');
+    const charTexture = textureLoader.load('/assets/char_1.png');
     charTexture.colorSpace = THREE.SRGBColorSpace;
 
-    // 2. Layered 2.5D character plane
-    const charGeo = new THREE.PlaneGeometry(3.1, 3.9);
+    // 2. Layered 2.5D character plane (aspect matched to char_1.png 1580x2028)
+    const charGeo = new THREE.PlaneGeometry(3.1, 3.98);
     this.charMat = new THREE.MeshBasicMaterial({
       map: charTexture,
       transparent: true,
