@@ -1,4 +1,4 @@
-﻿---
+---
 // CharacterSection.astro — Interactive Brand Companion Stage
 ---
 <section id="character" class="section-wrapper character-section" data-section="character">
@@ -118,9 +118,16 @@
 
 .guide-box {
   position: relative;
-  width: 360px;
-  height: 480px;
+  width: 380px;
+  height: 500px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.guide-box:hover {
+  border-color: rgba(215, 255, 0, 0.25);
 }
 
 .guide-corner {
@@ -150,6 +157,13 @@
 const pokeBtn = document.getElementById('btn-poke-char');
 if (pokeBtn) {
   pokeBtn.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('characterPoke'));
+  });
+}
+
+const guideBox = document.querySelector('.guide-box');
+if (guideBox) {
+  guideBox.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('characterPoke'));
   });
 }

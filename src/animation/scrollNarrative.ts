@@ -1,4 +1,4 @@
-﻿import gsap from 'gsap';
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { SceneManager } from '../three/SceneManager';
 
@@ -80,7 +80,7 @@ export function initScrollNarrative(sceneManager: SceneManager) {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 3. CONTINUOUS CROSS-FADE & SCRUB: FEATURES -> GAMES
+  // 3. CONTINUOUS CROSS-FADE & FAN-OUT DEAL: FEATURES -> GAMES
   // ─────────────────────────────────────────────────────────────────────────────
   const gamesEl = document.getElementById('games');
   if (featuresEl && gamesEl) {
@@ -96,23 +96,74 @@ export function initScrollNarrative(sceneManager: SceneManager) {
         sceneManager.productCore.targetOpacity = 1.0 - p;
         sceneManager.gamePlanes.targetOpacity = p;
 
+        // Drive dynamic 3D deal fan-out from stacked deck
+        sceneManager.gamePlanes.setScrollProgress(p * 0.40);
+
         sceneManager.productCore.targetPosition.z = gsap.utils.interpolate(-0.5, -3.0, p);
         sceneManager.targetCamPos.x = gsap.utils.interpolate(-0.5, 0.0, p);
-        sceneManager.targetCamPos.z = gsap.utils.interpolate(4.8, 4.2, p);
-        sceneManager.targetLookAt.x = gsap.utils.interpolate(-1.0, 0.0, p);
+        sceneManager.targetCamPos.z = gsap.utils.interpolate(4.8, 4.5, p);
+        sceneManager.targetLookAt.x = gsap.utils.interpolate(-1.0, 0.8, p);
       }
     });
 
-    // Gallery internal depth scroll
+    // Gallery internal depth scroll & continuous 3D card traversal
     ScrollTrigger.create({
       trigger: gamesEl,
-      start: 'top bottom',
-      end: 'bottom top',
-      scrub: true,
+      start: 'top center',
+      end: 'bottom center',
+      scrub: 1.0,
       onUpdate: (self) => {
-        sceneManager.gamePlanes.update(0.016, performance.now() * 0.001, self.progress);
+        // Scrub through 0.35 -> 0.85 across the exhibition
+        const mappedProgress = 0.35 + self.progress * 0.50;
+        sceneManager.gamePlanes.setScrollProgress(mappedProgress);
+
+        // Smooth camera track across the floating holographic deck
+        sceneManager.targetCamPos.x = gsap.utils.interpolate(0.0, 0.35, self.progress);
+        sceneManager.targetCamPos.z = gsap.utils.interpolate(4.5, 4.3, self.progress);
+        sceneManager.targetLookAt.x = gsap.utils.interpolate(0.8, 0.95, self.progress);
       }
     });
+
+    // Animate HUD spec boxes with 3D perspective flip on scroll enter
+    const hudBoxes = document.querySelectorAll('.spatial-hud-grid .hud-box');
+    if (hudBoxes.length > 0) {
+      gsap.fromTo(hudBoxes, 
+        { y: 50, opacity: 0, rotateX: -12, scale: 0.96 },
+        {
+          y: 0,
+          opacity: 1,
+          rotateX: 0,
+          scale: 1,
+          stagger: 0.14,
+          duration: 0.9,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '.spatial-hud-grid',
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
+
+    // Animate Deck selector tabs on scroll enter
+    const deckControls = document.querySelector('.game-deck-controls');
+    if (deckControls) {
+      gsap.fromTo(deckControls,
+        { y: 25, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.7,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: gamesEl,
+            start: 'top 70%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -131,10 +182,37 @@ export function initScrollNarrative(sceneManager: SceneManager) {
         sceneManager.gamePlanes.targetOpacity = 1.0 - p;
         sceneManager.steamNetwork.targetOpacity = p;
 
+        // Cards smoothly recede into distance
+        sceneManager.gamePlanes.setScrollProgress(0.85 + p * 0.15);
+
+        // Reset camera X & lookAt X back to center! (Prevents left-shift bug)
+        sceneManager.targetCamPos.x = gsap.utils.interpolate(0.35, 0.0, p);
+        sceneManager.targetLookAt.x = gsap.utils.interpolate(0.95, 0.0, p);
+
         sceneManager.targetCamPos.y = gsap.utils.interpolate(0.0, 0.2, p);
-        sceneManager.targetCamPos.z = gsap.utils.interpolate(4.2, 4.5, p);
+        sceneManager.targetCamPos.z = gsap.utils.interpolate(4.3, 4.5, p);
       }
     });
+
+    // Steam tabs table staggered row entrance
+    const steamRows = document.querySelectorAll('.steam-tabs-table .table-row');
+    if (steamRows.length > 0) {
+      gsap.fromTo(steamRows,
+        { x: -35, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          stagger: 0.10,
+          duration: 0.85,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '.steam-tabs-table',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -153,10 +231,33 @@ export function initScrollNarrative(sceneManager: SceneManager) {
         sceneManager.steamNetwork.targetOpacity = 1.0 - p;
         sceneManager.systemDiagnostics.targetOpacity = p;
 
+        sceneManager.targetCamPos.x = 0.0;
+        sceneManager.targetLookAt.x = 0.0;
         sceneManager.targetCamPos.y = gsap.utils.interpolate(0.2, 0.0, p);
         sceneManager.targetCamPos.z = gsap.utils.interpolate(4.5, 4.0, p);
       }
     });
+
+    // Telemetry dashboard quadrants 3D entrance
+    const sysQuads = document.querySelectorAll('.telemetry-dashboard .hud-quadrant');
+    if (sysQuads.length > 0) {
+      gsap.fromTo(sysQuads,
+        { y: 45, opacity: 0, scale: 0.95 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          stagger: 0.12,
+          duration: 0.85,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '.telemetry-dashboard',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -175,9 +276,31 @@ export function initScrollNarrative(sceneManager: SceneManager) {
         sceneManager.systemDiagnostics.targetOpacity = 1.0 - p;
         sceneManager.luaStream.targetOpacity = p;
 
+        sceneManager.targetCamPos.x = 0.0;
+        sceneManager.targetLookAt.x = 0.0;
         sceneManager.targetCamPos.z = gsap.utils.interpolate(4.0, 4.8, p);
       }
     });
+
+    // Lua pipeline cards entrance
+    const luaBlocks = document.querySelectorAll('#lua .anim-fade');
+    if (luaBlocks.length > 0) {
+      gsap.fromTo(luaBlocks,
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          stagger: 0.15,
+          duration: 0.9,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '#lua',
+            start: 'top 75%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -198,9 +321,31 @@ export function initScrollNarrative(sceneManager: SceneManager) {
 
         sceneManager.productCore.targetPosition.set(0, 0, 0);
         sceneManager.productCore.targetScale.set(1, 1, 1);
+        sceneManager.targetCamPos.x = 0.0;
+        sceneManager.targetLookAt.x = 0.0;
         sceneManager.targetCamPos.z = gsap.utils.interpolate(4.8, 4.8, p);
       }
     });
+
+    // Workbench slider panel entrance
+    const workbench = document.querySelector('.controls-workbench');
+    if (workbench) {
+      gsap.fromTo(workbench,
+        { y: 40, opacity: 0, scale: 0.98 },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.85,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '#interactive',
+            start: 'top 75%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -219,9 +364,50 @@ export function initScrollNarrative(sceneManager: SceneManager) {
         sceneManager.productCore.targetOpacity = 1.0 - p;
         sceneManager.characterStage.targetOpacity = p;
 
+        // Keep camera centered — characterStage sits naturally at X: 1.45 (right column)
+        sceneManager.targetCamPos.x = 0.0;
+        sceneManager.targetLookAt.x = 0.0;
         sceneManager.targetCamPos.z = gsap.utils.interpolate(4.8, 4.2, p);
       }
     });
+
+    // Editorial text & action card entrance (left column)
+    const charEditorial = document.querySelector('.char-editorial-block');
+    if (charEditorial) {
+      gsap.fromTo(charEditorial,
+        { x: -50, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 1.0,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '#character',
+            start: 'top 75%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
+
+    // Viewport guide box entrance (right column)
+    const charGuide = document.querySelector('.char-viewport-guide');
+    if (charGuide) {
+      gsap.fromTo(charGuide,
+        { scale: 0.92, opacity: 0 },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: 1.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '#character',
+            start: 'top 75%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -245,6 +431,8 @@ export function initScrollNarrative(sceneManager: SceneManager) {
         sceneManager.productCore.targetDistortion = gsap.utils.interpolate(1.0, 0.5, p);
         sceneManager.productCore.targetAccentMix = gsap.utils.interpolate(0.25, 0.85, p);
 
+        sceneManager.targetCamPos.x = 0.0;
+        sceneManager.targetLookAt.x = 0.0;
         sceneManager.targetCamPos.z = gsap.utils.interpolate(4.2, 5.0, p);
         sceneManager.targetLookAt.y = gsap.utils.interpolate(0.0, 0.3, p);
       }

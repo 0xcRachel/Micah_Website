@@ -338,7 +338,7 @@ export class SceneManager {
 
     // Update stages (internal lerps handle smooth opacity and transforms)
     this.productCore.update(delta, elapsed, this.camera.position);
-    this.gamePlanes.update(delta, elapsed, 0);
+    this.gamePlanes.update(delta, elapsed);
     this.steamNetwork.update(delta, elapsed);
     this.systemDiagnostics.update(delta, elapsed);
     this.luaStream.update(delta);

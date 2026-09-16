@@ -282,31 +282,32 @@ export class GamePlanes {
     this.recalculateSlots();
   }
 
+  public scrollProgress = 0.0;
+  private smoothScroll = 0.0;
+  private smoothVelocity = 0.0;
+
+  // Pre-calculated slot positions
+  private slotOffsets = [
+    // Slot 0: Active — center-stage, slight right offset, closest to camera
+    { pos: new THREE.Vector3(0.4,  0.05,  0.7),  rot: new THREE.Vector3(0.03, -0.18, -0.02), scale: 1.08, alpha: 1.0,  isHighlight: true  },
+    // Slot 1: Mid-right — receding in depth, tilted right
+    { pos: new THREE.Vector3(2.0,  0.30, -0.6),  rot: new THREE.Vector3(0.05, -0.36,  0.03),  scale: 0.92, alpha: 0.82, isHighlight: false },
+    // Slot 2: Deep-right background — furthest, most reclined
+    { pos: new THREE.Vector3(3.2,  0.70, -1.7),  rot: new THREE.Vector3(0.07, -0.46,  0.05),  scale: 0.82, alpha: 0.60, isHighlight: false },
+    // Slot 3: Left flank — balances the composition, slightly behind active
+    { pos: new THREE.Vector3(-1.4, -0.30, -0.5), rot: new THREE.Vector3(0.02,  0.20, -0.04),  scale: 0.88, alpha: 0.72, isHighlight: false }
+  ];
+
   // ─────────────────────────────────────────────────────────────────────────────
   // 3D Spatial Deck Slot Calculation
-  // Spreads 4 cards across the viewport: active card near center,
-  // background cards fan right, left flank anchors the composition.
   // ─────────────────────────────────────────────────────────────────────────────
   private recalculateSlots() {
     const total = this.planes.length;
 
-    // Slot definitions — centered around X≈0.5 so nothing crowds one edge.
-    // Camera lookAt is (0,0,0), cards are visible left-to-right.
-    const slotOffsets = [
-      // Slot 0: Active — center-stage, slight right offset, closest to camera
-      { pos: new THREE.Vector3(0.4,  0.05,  0.7),  rot: new THREE.Vector3(0.03, -0.18, -0.02), scale: 1.08, alpha: 1.0,  isHighlight: true  },
-      // Slot 1: Mid-right — receding in depth, tilted right
-      { pos: new THREE.Vector3(2.0,  0.30, -0.6),  rot: new THREE.Vector3(0.05, -0.36,  0.03),  scale: 0.92, alpha: 0.82, isHighlight: false },
-      // Slot 2: Deep-right background — furthest, most reclined
-      { pos: new THREE.Vector3(3.2,  0.70, -1.7),  rot: new THREE.Vector3(0.07, -0.46,  0.05),  scale: 0.82, alpha: 0.60, isHighlight: false },
-      // Slot 3: Left flank — balances the composition, slightly behind active
-      { pos: new THREE.Vector3(-1.4, -0.30, -0.5), rot: new THREE.Vector3(0.02,  0.20, -0.04),  scale: 0.88, alpha: 0.72, isHighlight: false }
-    ];
-
     this.planes.forEach((plane, i) => {
       // Offset relative to active card
       const slotIndex = (i - this.activeIndex + total) % total;
-      const slot = slotOffsets[slotIndex];
+      const slot = this.slotOffsets[slotIndex];
 
       plane.targetPos.copy(slot.pos);
       plane.targetRot.copy(slot.rot);
@@ -333,7 +334,20 @@ export class GamePlanes {
     this.group.add(this.networkLines);
   }
 
-  public update(delta: number, elapsed: number, _scrollProgress: number) {
+  public setScrollProgress(v: number) {
+    this.scrollProgress = THREE.MathUtils.clamp(v, 0, 1);
+  }
+
+  public update(delta: number, elapsed: number, scrollProgress?: number) {
+    if (typeof scrollProgress === 'number') {
+      this.scrollProgress = scrollProgress;
+    }
+
+    // Inertial smoothing on scroll progress & velocity
+    const prevSmooth = this.smoothScroll;
+    this.smoothScroll += (this.scrollProgress - this.smoothScroll) * 0.12;
+    this.smoothVelocity = (this.smoothScroll - prevSmooth) / Math.max(0.001, delta);
+
     this.currentOpacity += (this.targetOpacity - this.currentOpacity) * 0.08;
     this.group.visible = this.currentOpacity > 0.005;
 
@@ -341,30 +355,63 @@ export class GamePlanes {
     const mouseTiltX = -this.pointer.y * 0.15;
     const mouseTiltY =  this.pointer.x * 0.18;
 
+    // Compact stacked deck origin (cards originate tightly stacked before dealing)
+    const stackOrigin = new THREE.Vector3(0.6, -1.0, -2.0);
+    const stackRot    = new THREE.Vector3(0.20, -0.10, -0.06);
+
     const positions: number[] = [];
+    const total = this.planes.length;
 
     this.planes.forEach((plane, i) => {
-      // Floating oscillation unique per card
-      const floatY = Math.sin(elapsed * 1.3 + i * 1.6) * 0.07;
+      const slotIndex = (i - this.activeIndex + total) % total;
+      const slot = this.slotOffsets[slotIndex];
+
+      // ─── 1. Fan-out Stagger Deal (Entry Phase 0.0 -> 0.35) ─────────────────
+      // Each card shoots outward from the compact stack with an index delay
+      const cardEntry = THREE.MathUtils.clamp((this.smoothScroll - i * 0.05) / 0.28, 0, 1);
+      const ease = cardEntry * cardEntry * (3.0 - 2.0 * cardEntry);
+
+      const basePos   = new THREE.Vector3().lerpVectors(stackOrigin, slot.pos, ease);
+      const baseRot   = new THREE.Vector3().lerpVectors(stackRot, slot.rot, ease);
+      const baseScale = THREE.MathUtils.lerp(0.70, slot.scale, ease);
+
+      // ─── 2. Continuous Scroll Depth Traversal (0.35 -> 1.0) ───────────────
+      const scrollDepth = THREE.MathUtils.clamp((this.smoothScroll - 0.35) / 0.55, 0, 1);
+      const drift = scrollDepth - 0.5;
+
+      // Active card glides forward into view, background cards fan across depth
+      const parallaxZ = (slotIndex === 0 ? drift * 0.45 : -drift * 0.60);
+      const parallaxX = (slotIndex === 0 ? drift * 0.22 : (slotIndex === 3 ? -drift * 0.35 : drift * 0.40));
+      const parallaxY = drift * (slotIndex === 0 ? -0.12 : 0.18);
+
+      // ─── 3. Scroll Inertia Pitch & Roll (dynamic velocity reaction) ────────
+      const scrollTiltX = THREE.MathUtils.clamp(this.smoothVelocity * 0.08, -0.22, 0.22);
+      const scrollTiltZ = THREE.MathUtils.clamp(this.smoothVelocity * (slotIndex === 3 ? 0.06 : -0.06), -0.14, 0.14);
+
+      // Subtle atmospheric float
+      const floatY = Math.sin(elapsed * 1.3 + i * 1.6) * 0.06;
       const floatRotZ = Math.sin(elapsed * 0.8 + i * 1.2) * 0.015;
 
       const destPos = new THREE.Vector3(
-        plane.targetPos.x,
-        plane.targetPos.y + floatY,
-        plane.targetPos.z
+        basePos.x + parallaxX,
+        basePos.y + floatY + parallaxY,
+        basePos.z + parallaxZ
       );
 
-      // Smooth inertial interpolation
-      plane.group.position.lerp(destPos, 0.07);
-      plane.group.scale.lerp(plane.targetScale, 0.07);
+      // Smooth interpolation
+      plane.group.position.lerp(destPos, 0.08);
+      plane.group.scale.set(baseScale, baseScale, baseScale);
 
-      plane.group.rotation.x += (plane.targetRot.x + mouseTiltX - plane.group.rotation.x) * 0.06;
-      plane.group.rotation.y += (plane.targetRot.y + mouseTiltY - plane.group.rotation.y) * 0.06;
-      plane.group.rotation.z += (plane.targetRot.z + floatRotZ - plane.group.rotation.z) * 0.06;
+      const targetRotX = baseRot.x + mouseTiltX + scrollTiltX;
+      const targetRotY = baseRot.y + mouseTiltY;
+      const targetRotZ = baseRot.z + floatRotZ + scrollTiltZ;
 
-      // Smooth opacity
-      plane.currentAlpha += (plane.targetAlpha - plane.currentAlpha) * 0.08;
-      const finalAlpha = plane.currentAlpha * this.currentOpacity;
+      plane.group.rotation.x += (targetRotX - plane.group.rotation.x) * 0.08;
+      plane.group.rotation.y += (targetRotY - plane.group.rotation.y) * 0.08;
+      plane.group.rotation.z += (targetRotZ - plane.group.rotation.z) * 0.08;
+
+      // Smooth opacity calculation (combines section opacity, slot alpha, and deal ease)
+      const finalAlpha = slot.alpha * this.currentOpacity * ease;
 
       plane.group.traverse((obj) => {
         if ((obj as THREE.Mesh).material) {
@@ -376,6 +423,12 @@ export class GamePlanes {
 
       positions.push(plane.group.position.x, plane.group.position.y, plane.group.position.z);
     });
+
+    // ─── 4. Laser Shimmer Surge on Scroll ──────────────────────────────────
+    if (this.networkLines) {
+      const lineMat = this.networkLines.material as THREE.LineBasicMaterial;
+      lineMat.opacity = (0.30 + Math.min(0.55, Math.abs(this.smoothVelocity) * 0.50)) * this.currentOpacity;
+    }
 
     // Update connecting laser threads between adjacent cards
     const linePosAttr = this.networkLines.geometry.getAttribute('position') as THREE.BufferAttribute;
@@ -390,7 +443,6 @@ export class GamePlanes {
         lineArray[ptr++] = positions[a * 3 + 1];
         lineArray[ptr++] = positions[a * 3 + 2];
         lineArray[ptr++] = positions[b * 3];
-        lineArray[b * 3 + 1]; // read
         lineArray[ptr++] = positions[b * 3 + 1];
         lineArray[ptr++] = positions[b * 3 + 2];
       });
