@@ -1,0 +1,325 @@
+---
+// Maintenance.astro — System Maintenance Wrapper (Mono / Black & White)
+// Dùng: <Maintenance enabled={true}> <slot /> </Maintenance>
+// Mặc định: enabled = true (đang bảo trì). Tắt = false để mở web lại.
+interface Props {
+  enabled?: boolean;
+  title?: string;
+  subtitle?: string;
+  eta?: string;
+  showClock?: boolean;
+  showProgress?: boolean;
+  contactEmail?: string;
+}
+
+const {
+  enabled = true,
+  title = "SYSTEM MAINTENANCE",
+  subtitle = "Hệ thống đang được nâng cấp để phục vụ bạn tốt hơn. Vui lòng quay lại sau ít phút.",
+  eta = "ETA — 02:00:00",
+  showClock = true,
+  showProgress = true,
+  contactEmail = "support@micah0xc.app",
+} = Astro.props;
+
+const services = [
+  { name: "AUTH / LOGIN", status: "MAINTENANCE", code: "503" },
+  { name: "GAME LIBRARY", status: "MAINTENANCE", code: "503" },
+  { name: "STEAM SYNC", status: "UPGRADING", code: "102" },
+  { name: "DOWNLOAD SERVER", status: "STANDBY", code: "200" },
+];
+---
+
+{enabled && (
+  <div id="maintenance-wrapper" class="mnt" role="alert" aria-live="assertive" aria-label="Website đang bảo trì">
+    <!-- BG layers: grid + vignette + noise + scanline -->
+    <div class="mnt-bg" aria-hidden="true">
+      <div class="mnt-grid"></div>
+      <div class="mnt-vignette"></div>
+      <div class="mnt-noise"></div>
+      <div class="mnt-scan"></div>
+    </div>
+
+    <!-- Giant outline watermark -->
+    <div class="mnt-watermark" aria-hidden="true">MICAH</div>
+
+    <!-- Top HUD bar -->
+    <header class="mnt-top">
+      <div class="mnt-brand">
+        <span class="mnt-logo">⬢</span>
+        <span class="mnt-brand-text">MICAH <b>0xC</b></span>
+        <span class="mnt-div">/</span>
+        <span class="mnt-ver">REV.0xC — PROD</span>
+      </div>
+      <div class="mnt-top-right">
+        {showClock && <span id="mnt-clock" class="mnt-clock">00:00:00</span>}
+        <span class="mnt-pill"><span class="mnt-dot"></span>503 — MAINTENANCE</span>
+      </div>
+    </header>
+
+    <!-- Corner brackets -->
+    <span class="mnt-corner tl" aria-hidden="true"></span>
+    <span class="mnt-corner tr" aria-hidden="true"></span>
+    <span class="mnt-corner bl" aria-hidden="true"></span>
+    <span class="mnt-corner br" aria-hidden="true"></span>
+
+    <!-- Main -->
+    <main class="mnt-main">
+      <div class="mnt-badge">
+        <span class="mnt-badge-dot"></span>
+        <span>SCHEDULED MAINTENANCE // HỆ THỐNG BẢO TRÌ</span>
+      </div>
+
+      <h1 class="mnt-title">
+        <span class="mnt-line mnt-solid">{title}</span>
+        <span class="mnt-line mnt-outline">BẢO TRÌ</span>
+        <span class="mnt-line mnt-solid">HỆ THỐNG</span>
+      </h1>
+
+      <p class="mnt-sub">{subtitle}</p>
+
+      {showProgress && (
+        <div class="mnt-progress-block">
+          <div class="mnt-progress-meta">
+            <span>UPGRADING CORE SYSTEMS…</span>
+            <span id="mnt-pct">00%</span>
+          </div>
+          <div class="mnt-bar"><div id="mnt-fill" class="mnt-fill"></div></div>
+          <div class="mnt-progress-meta dim">
+            <span id="mnt-step">MOUNTING RUNTIME…</span>
+            <span>{eta}</span>
+          </div>
+        </div>
+      )}
+
+      <!-- Services status -->
+      <div class="mnt-services">
+        {services.map((s) => (
+          <div class="mnt-svc">
+            <span class="mnt-svc-name">{s.name}</span>
+            <span class="mnt-svc-right">
+              <span class="mnt-svc-code">{s.code}</span>
+              <span class="mnt-svc-status">{s.status}</span>
+              <span class="mnt-svc-led"></span>
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <!-- Actions -->
+      <div class="mnt-actions">
+        <button id="mnt-retry" class="mnt-btn mnt-btn-white" type="button">
+          <span>THỬ LẠI</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+        </button>
+        <a href={`mailto:${contactEmail}`} class="mnt-btn mnt-btn-ghost">
+          <span>LIÊN HỆ HỖ TRỢ</span>
+        </a>
+      </div>
+
+      <p class="mnt-note">Error 503 — Service Temporarily Unavailable. Mọi dữ liệu của bạn được bảo toàn tuyệt đối.</p>
+    </main>
+
+    <!-- Bottom HUD -->
+    <footer class="mnt-bottom">
+      <span>[ SYS.BOOT // STANDBY ]</span>
+      <span class="mnt-marquee-wrap"><span class="mnt-marquee">BẢO TRÌ HỆ THỐNG — SYSTEM MAINTENANCE — WE'LL BE BACK SOON — BẢO TRÌ HỆ THỐNG — SYSTEM MAINTENANCE —&nbsp;</span></span>
+      <span>[ MEM &lt; 45MB // SECURE ]</span>
+    </footer>
+  </div>
+)}
+
+<!-- Nội dung web thật nằm bên dưới lớp phủ (vẫn render để SEO, nhưng bị che + khóa scroll khi bảo trì) -->
+<div class={enabled ? "mnt-slot mnt-locked" : "mnt-slot"}>
+  <slot />
+</div>
+
+<style>
+  .mnt {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #060606;
+    color: #fff;
+    font-family: 'Inter', -apple-system, sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .mnt-slot.mnt-locked { filter: blur(2px) grayscale(1); pointer-events: none; user-select: none; }
+  :global(body.mnt-lock) { overflow: hidden !important; }
+
+  /* BG */
+  .mnt-bg { position: absolute; inset: 0; pointer-events: none; }
+  .mnt-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 20%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 20%, transparent 85%);
+  }
+  .mnt-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 70% at 50% 45%, transparent 30%, rgba(0,0,0,.85) 100%); }
+  .mnt-noise {
+    position: absolute; inset: 0; opacity: .07;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .mnt-scan { position: absolute; left: 0; right: 0; height: 120px; top: -120px;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,.05), transparent);
+    animation: scan 5s linear infinite; }
+  @keyframes scan { to { transform: translateY(120vh); } }
+
+  .mnt-watermark {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-52%);
+    font-size: clamp(120px, 24vw, 340px); font-weight: 800; letter-spacing: -.05em; line-height: 1;
+    color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.06);
+    user-select: none; pointer-events: none; white-space: nowrap;
+  }
+
+  /* Top / bottom HUD */
+  .mnt-top, .mnt-bottom {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 1.1rem 1.6rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em;
+    color: #8a8a8a; border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .mnt-bottom { border-bottom: none; border-top: 1px solid rgba(255,255,255,.08); margin-top: auto; }
+  .mnt-brand { display: flex; align-items: center; gap: .6rem; color: #fff; }
+  .mnt-logo { font-size: 16px; }
+  .mnt-brand-text { font-weight: 700; letter-spacing: .18em; }
+  .mnt-brand-text b { background: #fff; color: #000; padding: 0 .3em; font-weight: 800; }
+  .mnt-div { opacity: .3; } .mnt-ver { color: #6b6b6b; }
+  .mnt-top-right { display: flex; align-items: center; gap: .9rem; }
+  .mnt-clock { color: #fff; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); padding: .3rem .7rem; }
+  .mnt-pill { display: inline-flex; align-items: center; gap: .5rem; border: 1px solid rgba(255,255,255,.2); padding: .35rem .8rem; color: #fff; background: rgba(255,255,255,.04); }
+  .mnt-dot { width: 7px; height: 7px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px #fff; animation: blink 1s ease-in-out infinite alternate; }
+  @keyframes blink { from { opacity: .25; } to { opacity: 1; } }
+
+  /* Corners */
+  .mnt-corner { position: absolute; width: 22px; height: 22px; border: 0 solid rgba(255,255,255,.5); z-index: 2; }
+  .mnt-corner.tl { top: 74px; left: 18px; border-top-width: 2px; border-left-width: 2px; }
+  .mnt-corner.tr { top: 74px; right: 18px; border-top-width: 2px; border-right-width: 2px; }
+  .mnt-corner.bl { bottom: 74px; left: 18px; border-bottom-width: 2px; border-left-width: 2px; }
+  .mnt-corner.br { bottom: 74px; right: 18px; border-bottom-width: 2px; border-right-width: 2px; }
+
+  /* Main */
+  .mnt-main {
+    position: relative; z-index: 2; width: 100%; max-width: 860px; margin: 0 auto;
+    padding: clamp(2rem, 5vh, 4rem) 1.6rem; display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .mnt-badge {
+    display: inline-flex; align-items: center; gap: .6rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .2em;
+    color: #cfcfcf; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.03);
+    padding: .5rem 1rem; margin-bottom: 1.6rem;
+  }
+  .mnt-badge-dot { width: 7px; height: 7px; background: #fff; border-radius: 50%; animation: blink 1s infinite alternate; }
+
+  .mnt-title { display: flex; flex-direction: column; gap: .1em; line-height: .92; margin-bottom: 1.4rem; }
+  .mnt-line { font-size: clamp(44px, 9vw, 108px); font-weight: 800; letter-spacing: -.04em; text-transform: uppercase; }
+  .mnt-solid { color: #fff; text-shadow: 0 0 60px rgba(255,255,255,.15); }
+  .mnt-outline { color: transparent; -webkit-text-stroke: 1.5px #fff; }
+  .mnt-sub { max-width: 560px; color: #b5b5b5; font-size: clamp(14px, 2vw, 17px); line-height: 1.6; margin-bottom: 2rem; }
+
+  /* Progress */
+  .mnt-progress-block { width: 100%; max-width: 520px; margin-bottom: 1.8rem; }
+  .mnt-progress-meta { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .12em; color: #eee; margin-bottom: .6rem; }
+  .mnt-progress-meta.dim { color: #777; margin-top: .6rem; margin-bottom: 0; }
+  .mnt-bar { height: 3px; background: rgba(255,255,255,.1); overflow: hidden; }
+  .mnt-fill { height: 100%; width: 0%; background: #fff; box-shadow: 0 0 14px rgba(255,255,255,.8); transition: width .4s ease; }
+
+  /* Services */
+  .mnt-services { width: 100%; max-width: 520px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.02); margin-bottom: 2rem; }
+  .mnt-svc { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .8rem 1rem; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .12em; }
+  .mnt-svc + .mnt-svc { border-top: 1px solid rgba(255,255,255,.08); }
+  .mnt-svc-name { color: #fff; font-weight: 600; }
+  .mnt-svc-right { display: flex; align-items: center; gap: .7rem; color: #8d8d8d; }
+  .mnt-svc-code { border: 1px solid rgba(255,255,255,.15); padding: .1rem .45rem; color: #bbb; }
+  .mnt-svc-status { color: #fff; }
+  .mnt-svc-led { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: blink 1.2s infinite alternate; }
+
+  /* Buttons — black & white only */
+  .mnt-actions { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-bottom: 1.4rem; }
+  .mnt-btn {
+    display: inline-flex; align-items: center; gap: .7rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; letter-spacing: .1em;
+    padding: 1rem 2rem; text-decoration: none; cursor: pointer; border: 1px solid #fff;
+    transition: transform .2s ease, background .2s ease, color .2s ease;
+  }
+  .mnt-btn-white { background: #fff; color: #000; }
+  .mnt-btn-white:hover { background: #000; color: #fff; transform: translateY(-2px); }
+  .mnt-btn-ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,.35); }
+  .mnt-btn-ghost:hover { border-color: #fff; background: rgba(255,255,255,.08); transform: translateY(-2px); }
+  .mnt-note { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .06em; color: #6f6f6f; max-width: 520px; line-height: 1.7; }
+
+  /* Marquee */
+  .mnt-marquee-wrap { flex: 1; overflow: hidden; white-space: nowrap; max-width: 46vw; mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); }
+  .mnt-marquee { display: inline-block; animation: mq 18s linear infinite; color: #a8a8a8; }
+  @keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  @media (max-width: 640px) {
+    .mnt-ver, .mnt-bottom > span:first-child, .mnt-bottom > span:last-child { display: none; }
+    .mnt-marquee-wrap { max-width: 90vw; }
+    .mnt-corner { display: none; }
+    .mnt-clock { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mnt-scan, .mnt-marquee, .mnt-dot, .mnt-badge-dot, .mnt-svc-led { animation: none !important; }
+  }
+</style>
+
+<script>
+  function initMaintenance() {
+    const wrap = document.getElementById('maintenance-wrapper');
+    if (!wrap) { document.body.classList.remove('mnt-lock'); return; }
+    document.body.classList.add('mnt-lock');
+
+    // Live clock
+    const clock = document.getElementById('mnt-clock');
+    const tick = () => {
+      if (!clock) return;
+      const d = new Date();
+      const p = (n: number) => String(n).padStart(2, '0');
+      clock.textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+    };
+    tick();
+    const clockInt = setInterval(tick, 1000);
+
+    // Fake upgrading progress 0 -> 92% (không bao giờ 100% khi đang bảo trì)
+    const fill = document.getElementById('mnt-fill');
+    const pct = document.getElementById('mnt-pct');
+    const step = document.getElementById('mnt-step');
+    const steps = ['MOUNTING RUNTIME…', 'MIGRATING DATABASE…', 'SYNCING STEAM PIPE…', 'OPTIMIZING ASSETS…', 'VERIFYING INTEGRITY…'];
+    let p = 0, si = 0;
+    const progInt = setInterval(() => {
+      p = Math.min(92, p + Math.random() * 7);
+      if (fill) fill.style.width = p.toFixed(0) + '%';
+      if (pct) pct.textContent = String(Math.floor(p)).padStart(2, '0') + '%';
+      if (step && Math.random() > 0.6) { si = (si + 1) % steps.length; step.textContent = steps[si]; }
+      if (p >= 92) clearInterval(progInt);
+    }, 700);
+
+    // Retry button: rung nhẹ + báo đang kiểm tra
+    const retry = document.getElementById('mnt-retry');
+    retry?.addEventListener('click', () => {
+      if (step) step.textContent = 'CHECKING STATUS… STILL IN MAINTENANCE';
+      retry.animate(
+        [{ transform: 'translateX(0)' }, { transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }],
+        { duration: 220, iterations: 2 }
+      );
+    });
+
+    // Dọn khi unmount (SPA nav)
+    new MutationObserver(() => {
+      if (!document.getElementById('maintenance-wrapper')) {
+        clearInterval(clockInt); clearInterval(progInt);
+        document.body.classList.remove('mnt-lock');
+      }
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initMaintenance);
+  else initMaintenance();
+</script>

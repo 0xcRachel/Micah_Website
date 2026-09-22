@@ -14,9 +14,16 @@ import InteractiveShowcase from '../components/InteractiveShowcase.astro';
 import CharacterSection from '../components/CharacterSection.astro';
 import DownloadSection from '../components/DownloadSection.astro';
 import Footer from '../components/Footer.astro';
+import Maintenance from '../components/Maintenance.astro';
+
+// ⭐ CÔNG TẮC BẢO TRÌ — mặc định = true (đang bảo trì).
+// Đổi thành false để mở web lại bình thường.
+const MAINTENANCE_MODE = true;
 ---
 
 <Layout>
+  <!-- Maintenance wrapper bao quanh toàn bộ web -->
+  <Maintenance enabled={MAINTENANCE_MODE}>
   <Preloader />
 
   <!-- MINIMAL HEADER & 3-LINE MENU -->
@@ -56,4 +63,5 @@ import Footer from '../components/Footer.astro';
 
   <!-- 12 — FOOTER -->
   <Footer />
+  </Maintenance>
 </Layout>
